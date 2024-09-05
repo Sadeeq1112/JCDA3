@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=jcda.com.ng/home/bfsllkdc/public_html
+    - /bin/cp -R * $DEPLOYPATH

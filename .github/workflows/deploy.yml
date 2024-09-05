@@ -16,4 +16,4 @@ jobs:
           server: ${{ secrets.CPANEL_FTP_SERVER }}
           username: ${{ secrets.CPANEL_FTP_USERNAME }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-          server-dir: jcda.com/home/bfsllkdc/public_html
+          server-dir: jcda.com.ng/home/bfsllkdc/public_html
