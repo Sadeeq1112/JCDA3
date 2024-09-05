@@ -35,6 +35,7 @@ body{
 .jcda-news-carousel {
     position: relative;
     overflow: hidden;
+    touch-action: pan-y;
 }
 .jcda-news-wrapper {
     display: flex;
