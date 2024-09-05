@@ -303,6 +303,63 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="jcda-news-container">
+                            <h1 class="jcda-news-title">JCDA News</h1>
+                            <div class="jcda-news-filters">
+                                <button class="jcda-filter-btn active">All</button>
+                                <button class="jcda-filter-btn">Events</button>
+                                <button class="jcda-filter-btn">Updates</button>
+                            </div>
+                            <div class="jcda-news-carousel">
+                                <div class="jcda-news-wrapper">
+                                    <div class="jcda-news-item">
+                                        <img src="cheif imam.webp" alt="News 1" class="jcda-news-image">
+                                        <div class="jcda-news-content">
+                                            <h3 class="jcda-news-item-title">JCDA Mourns.....</h3>
+                                            <p>The description over of the loss of the Islamic Leader Sheikh Lawal Adams is contained in a press release dated 11th July issued by jasawa Development Association signed by its  president Alhaji Yawale Muhammad and made available to this medium in Jos, plateau State. </p>
+                                            <span class="jcda-news-category">Events</span>
+                                        </div>
+                                    </div>
+                                    <div class="jcda-news-item">
+                                        <img src="plateau state.jpeg" alt="News 2" class="jcda-news-image">
+                                        <div class="jcda-news-content">
+                                            <h2 class="jcda-news-item-title">JCDA appeals .....</h2>
+                                            <p>The Jasawa Community Development Association (JCDA), Plateau State, has made a passionate appeal to the State Government and the Security Agencies to consider total relaxation of curfew to help reduce the hardship citizens were tight to.
+
+                                            </p>
+                                            <span class="jcda-news-category">Updates</span>
+                                        </div>
+                                    </div>
+                                    <div class="jcda-news-item">
+                                        <img src="/api/placeholder/400/300" alt="News 3" class="jcda-news-image">
+                                        <div class="jcda-news-content">
+                                            <h2 class="jcda-news-item-title">JCDA Receives Industry Award</h2>
+                                            <p>We're proud to announce that JCDA has been recognized for excellence in...</p>
+                                            <span class="jcda-news-category">Updates</span>
+                                        </div>
+                                    </div>
+                                    <div class="jcda-news-item">
+                                        <img src="/api/placeholder/400/300" alt="News 4" class="jcda-news-image">
+                                        <div class="jcda-news-content">
+                                            <h2 class="jcda-news-item-title">Upcoming Workshop Series</h2>
+                                            <p>Join us for a series of workshops focusing on professional development...</p>
+                                            <span class="jcda-news-category">Events</span>
+                                        </div>
+                                    </div>
+                                    <div class="jcda-news-item">
+                                        <img src="/api/placeholder/400/300" alt="News 5" class="jcda-news-image">
+                                        <div class="jcda-news-content">
+                                            <h2 class="jcda-news-item-title">New Partnership Announcement</h2>
+                                            <p>JCDA is excited to announce a new partnership with...</p>
+                                            <span class="jcda-news-category">Updates</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="jcda-carousel-btn jcda-prev-btn">&lt;</button>
+                                <button class="jcda-carousel-btn jcda-next-btn">&gt;</button>
+                            </div>
+                        </div>
+                    
                         <div class="section mcb-section  full-width" style="padding-left:5%;padding-right:5%">
                             <div class="section_wrapper mcb-section-inner">
                                 <div class="wrap mcb-wrap one  valign-top clearfix" style="padding:110px 10% 95px;background-color:#000;background-image:url(img4.webp);background-repeat:no-repeat;background-position:center;background-attachment:fixed;background-size:cover">
@@ -389,6 +446,39 @@
     <script src="plugins/rs-plugin-6.custom/js/rs6.min.js"></script>
 
 	<script>
+         document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.querySelector('.jcda-news-wrapper');
+            const items = document.querySelectorAll('.jcda-news-item');
+            const prevBtn = document.querySelector('.jcda-prev-btn');
+            const nextBtn = document.querySelector('.jcda-next-btn');
+            let currentIndex = 0;
+
+            function updateCarousel() {
+                const itemWidth = items[0].offsetWidth;
+                const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
+                wrapper.style.transform = `translateX(-${currentIndex * (itemWidth + 20)}px)`;
+                prevBtn.style.display = currentIndex > 0 ? 'block' : 'none';
+                nextBtn.style.display = currentIndex < maxIndex ? 'block' : 'none';
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateCarousel();
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
+                if (currentIndex < maxIndex) {
+                    currentIndex++;
+                    updateCarousel();
+                }
+            });
+
+            window.addEventListener('resize', updateCarousel);
+            updateCarousel();
+        });
 	var revapi1, tpj;
 	jQuery(function() {
 		tpj = jQuery;
