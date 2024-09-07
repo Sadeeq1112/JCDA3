@@ -17,20 +17,20 @@ $action = $_GET['action'] ?? '';
 
 switch ($action) {
     case 'get_articles':
-        $if_modified_since = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? 
-            strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : 0;
+        $last_fetch_time = isset($_GET['last_fetch']) ? intval($_GET['last_fetch']) : 0;
 
         $stmt = $conn->prepare("SELECT * FROM articles WHERE last_modified > ? ORDER BY date DESC");
-        $stmt->bind_param("i", $if_modified_since);
+        $stmt->bind_param("i", $last_fetch_time);
         $stmt->execute();
         $result = $stmt->get_result();
         $articles = $result->fetch_all(MYSQLI_ASSOC);
 
-        if (empty($articles)) {
-            http_response_code(304); // Not Modified
-        } else {
-            echo json_encode($articles);
-        }
+        $response = [
+            'articles' => $articles,
+            'server_time' => time()
+        ];
+
+        echo json_encode($response);
         break;
 
     case 'save_article':
@@ -44,7 +44,7 @@ switch ($action) {
             $stmt->bind_param("ssssssi", $data['title'], $data['date'], $data['author'], $data['category'], $data['image'], $data['content'], $current_time);
         }
         if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'id' => $stmt->insert_id ?? $data['id']]);
+            echo json_encode(['success' => true, 'id' => $stmt->insert_id ?? $data['id'], 'last_modified' => $current_time]);
         } else {
             echo json_encode(['error' => $stmt->error]);
         }

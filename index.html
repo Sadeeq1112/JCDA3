@@ -406,38 +406,41 @@
 
 	<script>
        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.querySelector('.jcda-news-carousel');
     const wrapper = document.querySelector('.jcda-news-wrapper');
     const prevBtn = document.querySelector('.jcda-prev-btn');
     const nextBtn = document.querySelector('.jcda-next-btn');
     let currentIndex = 0;
     let startX, moveX, startY, moveY, isDown = false;
-    let lastModified = null;
+    let lastFetchTime = 0;
 
     async function loadNewsArticles() {
         try {
-            const headers = new Headers();
-            if (lastModified) {
-                headers.append('If-Modified-Since', new Date(lastModified).toUTCString());
-            }
-
-            const response = await fetch('api.php?action=get_articles', { headers });
+            const response = await fetch(`api.php?action=get_articles&last_fetch=${lastFetchTime}`);
+            const data = await response.json();
             
-            if (response.status === 304) {
-                // No new content
-                return;
+            if (data.articles && data.articles.length > 0) {
+                updateArticles(data.articles);
             }
-
-            const articles = await response.json();
             
-            // Update lastModified
-            const responseDate = response.headers.get('Last-Modified');
-            if (responseDate) {
-                lastModified = new Date(responseDate).getTime();
-            }
+            lastFetchTime = data.server_time;
+        } catch (error) {
+            console.error('Error loading news articles:', error);
+        }
+    }
 
-            wrapper.innerHTML = '';
-            articles.forEach(article => {
+    function updateArticles(articles) {
+        articles.forEach(article => {
+            const existingItem = document.querySelector(`.jcda-news-item[data-id="${article.id}"]`);
+            if (existingItem) {
+                // Update existing article
+                existingItem.querySelector('.jcda-news-item-title').textContent = article.title;
+                existingItem.querySelector('p').textContent = `${article.content.substring(0, 100)}...`;
+                existingItem.querySelector('.jcda-news-category').textContent = article.category;
+                existingItem.querySelector('.jcda-news-image').src = article.image;
+            } else {
+                // Add new article
                 const item = document.createElement('div');
                 item.className = 'jcda-news-item';
                 item.setAttribute('data-id', article.id);
@@ -450,11 +453,9 @@
                     </div>
                 `;
                 wrapper.appendChild(item);
-            });
-            updateCarousel();
-        } catch (error) {
-            console.error('Error loading news articles:', error);
-        }
+            }
+        });
+        updateCarousel();
     }
 
     function updateCarousel() {
@@ -541,7 +542,7 @@
 
     // Function to reload articles periodically
     function reloadArticlesPeriodically() {
-        setInterval(loadNewsArticles, 60000); // Reload every 60 seconds
+        setInterval(loadNewsArticles, 10000); // Reload every 60 seconds
     }
 
     reloadArticlesPeriodically();
