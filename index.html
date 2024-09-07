@@ -307,53 +307,12 @@
                             <h1 class="jcda-news-title">JCDA News</h1>
                             <div class="jcda-news-filters">
                                 <button class="jcda-filter-btn active">All</button>
-                                <button class="jcda-filter-btn">Events</button>
-                                <button class="jcda-filter-btn">Updates</button>
+                                <!-- <button class="jcda-filter-btn">Events</button>
+                                <button class="jcda-filter-btn">Updates</button> -->
                             </div>
                             <div class="jcda-news-carousel">
                                 <div class="jcda-news-wrapper">
-                                    <div class="jcda-news-item">
-                                        <img src="cheif imam.webp" alt="News 1" class="jcda-news-image">
-                                        <div class="jcda-news-content">
-                                            <h3 class="jcda-news-item-title">JCDA Mourns.....</h3>
-                                            <p>The description over of the loss of the Islamic Leader Sheikh Lawal Adams is contained in a press release dated 11th July issued by jasawa Development Association signed by its  president Alhaji Yawale Muhammad and made available to this medium in Jos, plateau State. </p>
-                                            <span class="jcda-news-category">Events</span>
-                                        </div>
-                                    </div>
-                                    <div class="jcda-news-item">
-                                        <img src="plateau state.jpeg" alt="News 2" class="jcda-news-image">
-                                        <div class="jcda-news-content">
-                                            <h2 class="jcda-news-item-title">JCDA appeals .....</h2>
-                                            <p>The Jasawa Community Development Association (JCDA), Plateau State, has made a passionate appeal to the State Government and the Security Agencies to consider total relaxation of curfew to help reduce the hardship citizens were tight to.
-
-                                            </p>
-                                            <span class="jcda-news-category">Updates</span>
-                                        </div>
-                                    </div>
-                                    <div class="jcda-news-item">
-                                        <img src="/api/placeholder/400/300" alt="News 3" class="jcda-news-image">
-                                        <div class="jcda-news-content">
-                                            <h2 class="jcda-news-item-title">JCDA Receives Industry Award</h2>
-                                            <p>We're proud to announce that JCDA has been recognized for excellence in...</p>
-                                            <span class="jcda-news-category">Updates</span>
-                                        </div>
-                                    </div>
-                                    <div class="jcda-news-item">
-                                        <img src="/api/placeholder/400/300" alt="News 4" class="jcda-news-image">
-                                        <div class="jcda-news-content">
-                                            <h2 class="jcda-news-item-title">Upcoming Workshop Series</h2>
-                                            <p>Join us for a series of workshops focusing on professional development...</p>
-                                            <span class="jcda-news-category">Events</span>
-                                        </div>
-                                    </div>
-                                    <div class="jcda-news-item">
-                                        <img src="/api/placeholder/400/300" alt="News 5" class="jcda-news-image">
-                                        <div class="jcda-news-content">
-                                            <h2 class="jcda-news-item-title">New Partnership Announcement</h2>
-                                            <p>JCDA is excited to announce a new partnership with...</p>
-                                            <span class="jcda-news-category">Updates</span>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                                 <button class="jcda-carousel-btn jcda-prev-btn">&lt;</button>
                                 <button class="jcda-carousel-btn jcda-next-btn">&gt;</button>
@@ -447,81 +406,118 @@
 
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
-            const carousel = document.querySelector('.jcda-news-carousel');
-            const wrapper = document.querySelector('.jcda-news-wrapper');
-            const items = document.querySelectorAll('.jcda-news-item');
-            const prevBtn = document.querySelector('.jcda-prev-btn');
-            const nextBtn = document.querySelector('.jcda-next-btn');
-            let currentIndex = 0;
-            let startX, moveX, isDown = false;
+    const carousel = document.querySelector('.jcda-news-carousel');
+    const wrapper = document.querySelector('.jcda-news-wrapper');
+    const prevBtn = document.querySelector('.jcda-prev-btn');
+    const nextBtn = document.querySelector('.jcda-next-btn');
+    let currentIndex = 0;
+    let startX, moveX, startY, moveY, isDown = false;
 
-            function updateCarousel() {
-                const itemWidth = items[0].offsetWidth;
-                const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
-                wrapper.style.transform = `translateX(-${currentIndex * (itemWidth + 20)}px)`;
-                prevBtn.style.display = currentIndex > 0 ? 'block' : 'none';
-                nextBtn.style.display = currentIndex < maxIndex ? 'block' : 'none';
-            }
-
-            function moveCarousel(direction) {
-                const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
-                if (direction === 'prev' && currentIndex > 0) {
-                    currentIndex--;
-                } else if (direction === 'next' && currentIndex < maxIndex) {
-                    currentIndex++;
-                }
-                updateCarousel();
-            }
-
-            prevBtn.addEventListener('click', () => moveCarousel('prev'));
-            nextBtn.addEventListener('click', () => moveCarousel('next'));
-
-            // Touch events for mobile swipe
-            carousel.addEventListener('touchstart', (e) => {
-                isDown = true;
-                startX = e.touches[0].pageX - wrapper.offsetLeft;
+    async function loadNewsArticles() {
+        try {
+            const response = await fetch('api.php?action=get_articles');
+            const articles = await response.json();
+            wrapper.innerHTML = '';
+            articles.forEach(article => {
+                const item = document.createElement('div');
+                item.className = 'jcda-news-item';
+                item.setAttribute('data-id', article.id);
+                item.innerHTML = `
+                    <img src="${article.image}" alt="${article.title}" class="jcda-news-image">
+                    <div class="jcda-news-content">
+                        <h2 class="jcda-news-item-title">${article.title}</h2>
+                        <p>${article.content.substring(0, 100)}...</p>
+                        <span class="jcda-news-category">${article.category}</span>
+                    </div>
+                `;
+                wrapper.appendChild(item);
             });
-
-            carousel.addEventListener('touchmove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                moveX = e.touches[0].pageX - wrapper.offsetLeft;
-                const walk = moveX - startX;
-                if (Math.abs(walk) > 50) {
-                    isDown = false;
-                    moveCarousel(walk > 0 ? 'prev' : 'next');
-                }
-            });
-
-            carousel.addEventListener('touchend', () => {
-                isDown = false;
-            });
-
-            // Automatic scroll on hover for desktop
-            let scrollInterval;
-            const startAutoScroll = () => {
-                scrollInterval = setInterval(() => {
-                    moveCarousel('next');
-                }, 1000); // Adjust scroll speed here (milliseconds)
-            };
-
-            const stopAutoScroll = () => {
-                clearInterval(scrollInterval);
-            };
-
-            if (window.matchMedia("(min-width: 768px)").matches) {
-                carousel.addEventListener('mouseenter', (e) => {
-                    if (e.clientX > window.innerWidth / 2) {
-                        startAutoScroll();
-                    }
-                });
-
-                carousel.addEventListener('mouseleave', stopAutoScroll);
-            }
-
-            window.addEventListener('resize', updateCarousel);
             updateCarousel();
+        } catch (error) {
+            console.error('Error loading news articles:', error);
+        }
+    }
+
+    function updateCarousel() {
+        const items = document.querySelectorAll('.jcda-news-item');
+        const itemWidth = items[0].offsetWidth;
+        const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
+        wrapper.style.transform = `translateX(-${currentIndex * (itemWidth + 20)}px)`;
+        prevBtn.style.display = currentIndex > 0 ? 'block' : 'none';
+        nextBtn.style.display = currentIndex < maxIndex ? 'block' : 'none';
+
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const newsId = item.getAttribute('data-id');
+                window.location.href = `news-article.php?id=${newsId}`;
+            });
         });
+    }
+
+    function moveCarousel(direction) {
+        const items = document.querySelectorAll('.jcda-news-item');
+        const maxIndex = items.length - (window.innerWidth >= 768 ? 4 : 1);
+        if (direction === 'prev' && currentIndex > 0) {
+            currentIndex--;
+        } else if (direction === 'next' && currentIndex < maxIndex) {
+            currentIndex++;
+        }
+        updateCarousel();
+    }
+
+    prevBtn.addEventListener('click', () => moveCarousel('prev'));
+    nextBtn.addEventListener('click', () => moveCarousel('next'));
+
+    // Touch events for mobile swipe
+    carousel.addEventListener('touchstart', (e) => {
+        isDown = true;
+        startX = e.touches[0].pageX - wrapper.offsetLeft;
+        startY = e.touches[0].pageY;
+    });
+
+    carousel.addEventListener('touchmove', (e) => {
+        if (!isDown) return;
+        moveX = e.touches[0].pageX - wrapper.offsetLeft;
+        moveY = e.touches[0].pageY;
+        const walkX = moveX - startX;
+        const walkY = moveY - startY;
+
+        if (Math.abs(walkX) > Math.abs(walkY) && Math.abs(walkX) > 50) {
+            e.preventDefault();
+            isDown = false;
+            moveCarousel(walkX > 0 ? 'prev' : 'next');
+        }
+    });
+
+    carousel.addEventListener('touchend', () => {
+        isDown = false;
+    });
+
+    // Automatic scroll on hover for desktop
+    let scrollInterval;
+    const startAutoScroll = () => {
+        scrollInterval = setInterval(() => {
+            moveCarousel('next');
+        }, 2000);
+    };
+
+    const stopAutoScroll = () => {
+        clearInterval(scrollInterval);
+    };
+
+    if (window.matchMedia("(min-width: 768px)").matches) {
+        carousel.addEventListener('mouseenter', (e) => {
+            if (e.clientX > window.innerWidth / 2) {
+                startAutoScroll();
+            }
+        });
+
+        carousel.addEventListener('mouseleave', stopAutoScroll);
+    }
+
+    window.addEventListener('resize', updateCarousel);
+    loadNewsArticles();
+});
 	var revapi1, tpj;
 	jQuery(function() {
 		tpj = jQuery;
