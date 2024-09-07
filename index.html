@@ -405,18 +405,37 @@
     <script src="plugins/rs-plugin-6.custom/js/rs6.min.js"></script>
 
 	<script>
-        document.addEventListener('DOMContentLoaded', function() {
+       document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.querySelector('.jcda-news-carousel');
     const wrapper = document.querySelector('.jcda-news-wrapper');
     const prevBtn = document.querySelector('.jcda-prev-btn');
     const nextBtn = document.querySelector('.jcda-next-btn');
     let currentIndex = 0;
     let startX, moveX, startY, moveY, isDown = false;
+    let lastModified = null;
 
     async function loadNewsArticles() {
         try {
-            const response = await fetch('api.php?action=get_articles');
+            const headers = new Headers();
+            if (lastModified) {
+                headers.append('If-Modified-Since', new Date(lastModified).toUTCString());
+            }
+
+            const response = await fetch('api.php?action=get_articles', { headers });
+            
+            if (response.status === 304) {
+                // No new content
+                return;
+            }
+
             const articles = await response.json();
+            
+            // Update lastModified
+            const responseDate = response.headers.get('Last-Modified');
+            if (responseDate) {
+                lastModified = new Date(responseDate).getTime();
+            }
+
             wrapper.innerHTML = '';
             articles.forEach(article => {
                 const item = document.createElement('div');
@@ -516,7 +535,16 @@
     }
 
     window.addEventListener('resize', updateCarousel);
+    
+    // Initial load
     loadNewsArticles();
+
+    // Function to reload articles periodically
+    function reloadArticlesPeriodically() {
+        setInterval(loadNewsArticles, 60000); // Reload every 60 seconds
+    }
+
+    reloadArticlesPeriodically();
 });
 	var revapi1, tpj;
 	jQuery(function() {
