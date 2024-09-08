@@ -7,7 +7,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header('Content-Type: application/json');
 
-if (!is_logged_in()) {
+if (!is_logged_in() && $_GET['action'] !== 'get_article') {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
@@ -33,6 +33,22 @@ switch ($action) {
         echo json_encode($response);
         break;
 
+    case 'get_article':
+        $id = $_GET['id'] ?? 0;
+        $stmt = $conn->prepare("SELECT * FROM articles WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $article = $result->fetch_assoc();
+        
+        if ($article) {
+            echo json_encode($article);
+        } else {
+            http_response_code(404);
+            echo json_encode(['error' => 'Article not found']);
+        }
+        break;
+
     case 'save_article':
         $data = json_decode(file_get_contents('php://input'), true);
         $current_time = time();
@@ -46,6 +62,7 @@ switch ($action) {
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'id' => $stmt->insert_id ?? $data['id'], 'last_modified' => $current_time]);
         } else {
+            http_response_code(500);
             echo json_encode(['error' => $stmt->error]);
         }
         break;
@@ -54,8 +71,12 @@ switch ($action) {
         $id = $_GET['id'] ?? 0;
         $stmt = $conn->prepare("DELETE FROM articles WHERE id = ?");
         $stmt->bind_param("i", $id);
-        $stmt->execute();
-        echo json_encode(['success' => true]);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => $stmt->error]);
+        }
         break;
 
     default:
