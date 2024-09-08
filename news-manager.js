@@ -5,16 +5,16 @@ tinymce.init({
     height: 300,
     setup: function(editor) {
         editor.on('change', function() {
-            editor.save(); // This saves the content to the original textarea
+            editor.save();
         });
     }
 });
 
-
 async function fetchArticles() {
     try {
         const response = await fetch('api.php?action=get_articles');
-        return await response.json();
+        const data = await response.json();
+        return data.articles;
     } catch (error) {
         console.error('Error fetching articles:', error);
     }
@@ -65,7 +65,6 @@ function displayArticles(articles) {
         tbody.appendChild(row);
     });
 
-    // Add event listeners for edit and delete buttons
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', (e) => editArticle(e.target.getAttribute('data-id')));
     });
@@ -85,7 +84,7 @@ async function editArticle(id) {
     try {
         const response = await fetch(`api.php?action=get_article&id=${id}`);
         const article = await response.json();
-        if (article) {
+        if (article && !article.error) {
             const form = document.getElementById('articleForm');
             form.articleId.value = article.id;
             form.title.value = article.title;
@@ -94,6 +93,8 @@ async function editArticle(id) {
             form.category.value = article.category;
             form.image.value = article.image;
             tinymce.get('content').setContent(article.content);
+        } else {
+            console.error('Article not found or error occurred');
         }
     } catch (error) {
         console.error('Error fetching article for editing:', error);
@@ -102,8 +103,12 @@ async function editArticle(id) {
 
 async function confirmDeleteArticle(id) {
     if (confirm('Are you sure you want to delete this article?')) {
-        await deleteArticle(id);
-        loadArticles();
+        const result = await deleteArticle(id);
+        if (result && result.success) {
+            await loadArticles();
+        } else {
+            console.error('Failed to delete article');
+        }
     }
 }
 
@@ -114,15 +119,12 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         console.log('Form submitted');
         
-        // Ensure TinyMCE content is saved to the textarea
         tinymce.triggerSave();
-        // Validate the content
         const content = tinymce.get('content').getContent();
         if (!content.trim()) {
             alert('Please enter some content for the article.');
             return;
         }
-        
         
         const article = {
             id: form.articleId.value || null,
@@ -131,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             author: form.author.value,
             category: form.category.value,
             image: form.image.value,
-            content: tinymce.get('content').getContent()
+            content: content
         };
 
         const result = await saveArticle(article);
@@ -139,9 +141,11 @@ document.addEventListener('DOMContentLoaded', function() {
             form.reset();
             form.articleId.value = '';
             tinymce.get('content').setContent('');
-            loadArticles();
+            await loadArticles();
+            alert('Article saved successfully!');
         } else {
             console.error('Failed to save article');
+            alert('Failed to save article. Please try again.');
         }
     });
 
