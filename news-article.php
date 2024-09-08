@@ -69,6 +69,7 @@ function formatDate($dateString) {
 <body>
     <article class="jcda-article">
         <header class="jcda-article-header">
+            
             <h1 class="jcda-article-title"><?php echo htmlspecialchars($article['title']); ?></h1>
             <p class="jcda-article-meta">Published on <time datetime="<?php echo $article['date']; ?>"><?php echo formatDate($article['date']); ?></time> by <?php echo htmlspecialchars($article['author']); ?></p>
             <span class="jcda-article-category"><?php echo htmlspecialchars($article['category']); ?></span>

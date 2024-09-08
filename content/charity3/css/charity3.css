@@ -1233,7 +1233,7 @@ h6, h6 a, h6 a:hover, a.content_link .title {
 	background-color: #378349;
 }
 a.button, a.tp-button {
-	background-color: #000;
+	background-color: #378349;
 	color: #fff;
 }
 .button-stroke a.button, .button-stroke a.button .button_icon i, .button-stroke a.tp-button {
