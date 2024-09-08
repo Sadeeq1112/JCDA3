@@ -14,11 +14,21 @@ async function fetchArticles() {
     try {
         const response = await fetch('api.php?action=get_articles');
         const data = await response.json();
-        return data.articles;
+        console.log('API response:', data); // Debug log
+        if (Array.isArray(data.articles)) {
+            return data.articles;
+        } else if (Array.isArray(data)) {
+            return data;
+        } else {
+            console.error('Unexpected data structure:', data);
+            return [];
+        }
     } catch (error) {
         console.error('Error fetching articles:', error);
+        return [];
     }
 }
+
 
 async function saveArticle(article) {
     try {
@@ -48,15 +58,20 @@ async function deleteArticle(id) {
 }
 
 function displayArticles(articles) {
+    console.log('Articles to display:', articles); // Debug log
+    if (!Array.isArray(articles)) {
+        console.error('articles is not an array:', articles);
+        return;
+    }
     const tbody = document.querySelector('#articleList tbody');
     tbody.innerHTML = '';
     articles.forEach(article => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${article.title}</td>
-            <td>${article.date}</td>
-            <td>${article.author}</td>
-            <td>${article.category}</td>
+            <td>${article.title || ''}</td>
+            <td>${article.date || ''}</td>
+            <td>${article.author || ''}</td>
+            <td>${article.category || ''}</td>
             <td>
                 <button class="btn btn-sm btn-outline-secondary edit-btn" data-id="${article.id}">Edit</button>
                 <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${article.id}">Delete</button>
@@ -75,8 +90,11 @@ function displayArticles(articles) {
 
 async function loadArticles() {
     const articles = await fetchArticles();
-    if (articles) {
+    console.log('Loaded articles:', articles); // Debug log
+    if (Array.isArray(articles)) {
         displayArticles(articles);
+    } else {
+        console.error('Invalid articles data:', articles);
     }
 }
 
