@@ -7,13 +7,17 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 header('Content-Type: application/json');
 
-if (!is_logged_in() && $_GET['action'] !== 'get_article') {
+$action = $_GET['action'] ?? '';
+
+// Define actions that don't require authentication
+$public_actions = ['get_articles', 'get_article'];
+
+// Check authentication for non-public actions
+if (!in_array($action, $public_actions) && !is_logged_in()) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
-
-$action = $_GET['action'] ?? '';
 
 switch ($action) {
     case 'get_articles':
