@@ -416,19 +416,36 @@
     let lastFetchTime = 0;
 
     async function loadNewsArticles() {
-        try {
-            const response = await fetch(`api.php?action=get_articles&last_fetch=${lastFetchTime}`);
-            const data = await response.json();
-            
-            if (data.articles && data.articles.length > 0) {
-                updateArticles(data.articles);
-            }
-            
-            lastFetchTime = data.server_time;
-        } catch (error) {
-            console.error('Error loading news articles:', error);
+    try {
+        const response = await fetch(`api.php?action=get_articles&last_fetch=${lastFetchTime}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        
+        console.log('API Response:', data);
+        
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid response format');
+        }
+        
+        if (data.articles && Array.isArray(data.articles) && data.articles.length > 0) {
+            updateArticles(data.articles);
+        } else {
+            console.log('No new articles to update');
+        }
+        
+        if (data.server_time) {
+            lastFetchTime = data.server_time;
+        } else {
+            console.warn('Server time not provided in the response');
+        }
+    } catch (error) {
+        console.error('Error loading news articles:', error);
     }
+}
 
     function updateArticles(articles) {
         articles.forEach(article => {
