@@ -326,7 +326,7 @@
                     
                         <div class="section mcb-section  full-width" style="padding-left:5%;padding-right:5%">
                             <div class="section_wrapper mcb-section-inner">
-                                <div class="wrap mcb-wrap one  valign-top clearfix" style="padding:110px 10% 95px;background-color:#000;background-image:url(img4.webp);background-repeat:no-repeat;background-position:center;background-attachment:fixed;background-size:cover">
+                              <div class="wrap mcb-wrap one valign-top clearfix" id="backgroundSlider">
                                     <div class="mcb-wrap-inner">
                                         <div class="column mcb-column one column_column">
                                             <div class="column_attr clearfix align_center">
@@ -410,6 +410,22 @@
     <script src="plugins/rs-plugin-6.custom/js/rs6.min.js"></script>
 
 	<script>
+
+const images = ['img4.webp', 'https://res.cloudinary.com/dtqzcsq0i/image/upload/v1725911977/3184058b-30f8-4578-b3e5-607d5cec533b_n7pdo0.jpg', 'https://res.cloudinary.com/dtqzcsq0i/image/upload/v1725911795/8d5c8733-9229-43ad-95db-aa6cd672f91d_sbe8kn.jpg',]; // Add your image filenames here
+        let currentIndex = 0;
+        const slider = document.getElementById('backgroundSlider');
+
+        function changeBackground() {
+            slider.style.backgroundImage = `url(${images[currentIndex]})`;
+            currentIndex = (currentIndex + 1) % images.length;
+        }
+
+        // Initial background set
+        changeBackground();
+
+        // Change background every 5 seconds
+        setInterval(changeBackground, 5000);
+        
        document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.querySelector('.jcda-news-carousel');
     const wrapper = document.querySelector('.jcda-news-wrapper');
