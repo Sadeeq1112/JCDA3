@@ -1,10 +1,10 @@
 <?php return array(
     'root' => array(
-        'name' => 'sadeeq/dashboard',
+        'name' => 'sadeeq/jcda_dashboard',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1fda81e608926de2bc5bb87e0306f6fa8ba4d9a7',
-        'type' => 'library',
+        'reference' => 'c4685817b5870167fa36e7f36dd7115b9e1d02ba',
+        'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
@@ -17,13 +17,13 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../firebase/php-jwt',
             'aliases' => array(),
-            'dev_requirement' => false,
+            'dev_requirement' => true,
         ),
-        'sadeeq/dashboard' => array(
+        'sadeeq/jcda_dashboard' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1fda81e608926de2bc5bb87e0306f6fa8ba4d9a7',
-            'type' => 'library',
+            'reference' => 'c4685817b5870167fa36e7f36dd7115b9e1d02ba',
+            'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,

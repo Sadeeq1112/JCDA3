@@ -1,0 +1,17 @@
+{
+    "name": "sadeeq/jcda_dashboard",
+    "description": "JCDA Dashboard Project",
+    "type": "project",
+    "require-dev": {
+        "firebase/php-jwt": "^6.10"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "abubakarelsadeeq521",
+            "email": "abubakarelsadeeq521@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
