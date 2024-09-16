@@ -1,0 +1,126 @@
+:root {
+    --jcda-primary: #0056b3;
+    --jcda-secondary: #6c757d;
+    --jcda-success: #28a745;
+    --jcda-danger: #dc3545;
+    --jcda-warning: #ffc107;
+    --jcda-info: #17a2b8;
+    --jcda-light: #f8f9fa;
+    --jcda-dark: #343a40;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.navbar-brand img {
+    margin-right: 10px;
+}
+
+.nav-link .fas, .btn .fas {
+    margin-right: 5px;
+}
+
+#content {
+    background-color: var(--jcda-light);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    transition: transform 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.table {
+    background-color: #fff;
+}
+
+.btn-primary {
+    background-color: var(--jcda-primary);
+    border-color: var(--jcda-primary);
+}
+
+.btn-primary:hover {
+    background-color: #004494;
+    border-color: #004494;
+}
+
+.btn-outline-primary {
+    color: var(--jcda-primary);
+    border-color: var(--jcda-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--jcda-primary);
+    color: #fff;
+}
+
+#alertArea {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 300px;
+}
+
+@media (max-width: 768px) {
+    .navbar-nav {
+        flex-direction: column;
+    }
+
+    .nav-item {
+        margin-bottom: 10px;
+    }
+
+    .d-flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn {
+        margin-bottom: 10px;
+    }
+
+    #content {
+        padding: 15px;
+    }
+
+    .card {
+        margin-bottom: 20px;
+    }
+}
+
+/* Accessibility enhancements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+a:focus, button:focus, input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--jcda-primary);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+    }
+}
