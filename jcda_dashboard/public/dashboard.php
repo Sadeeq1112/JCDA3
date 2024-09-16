@@ -30,22 +30,28 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Dashboard</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
-            <nav>
-                <ul>
-                    <li><a href="profile.php">Edit Profile</a></li>
-                    <li><a href="card.php">Membership Card</a></li>
-                    <li><a href="payment.php">Pay Dues</a></li>
-                    <li><a href="logout.php">Logout</a></li>
-                </ul>
-            </nav>
-        </header>
-        
-        <main>
+    <div class="dashboard">
+        <div class="sidebar">
+            <h2>JCDA</h2>
+            <ul>
+                <li><a href="#" class="active"><span class="sidebar-icon">📊</span> Dashboard</a></li>
+                <li><a href="profile.php"><span class="sidebar-icon">👤</span> Edit Profile</a></li>
+                <li><a href="card.php"><span class="sidebar-icon">💳</span> Membership Card</a></li>
+                <li><a href="payment.php"><span class="sidebar-icon">💰</span> Pay Dues</a></li>
+                <li><a href="logout.php"><span class="sidebar-icon">🚪</span> Logout</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
+                <div class="user-profile">
+                    <span>🔔</span>
+                    <img src="../assets/images/user-avatar.jpg" alt="User profile">
+                </div>
+            </div>
             <section class="profile-summary">
                 <h2>Profile Summary</h2>
                 <?php if ($profile): ?>
@@ -66,7 +72,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                     <p>No payment records found.</p>
                 <?php endif; ?>
             </section>
-        </main>
+        </div>
     </div>
     <script src="../assets/js/dashboard.js"></script>
 </body>
