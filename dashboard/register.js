@@ -24,13 +24,16 @@ document.getElementById('registerForm').addEventListener('submit', async functio
             body: JSON.stringify({ name, email, phone, password }),
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        console.log('Server response:', responseText);
 
         if (response.ok) {
+            const data = JSON.parse(responseText);
             alert('Registration successful! Please login.');
             window.location.href = 'login.html';
         } else {
-            alert(data.message || 'Registration failed. Please try again.');
+            console.error('Registration failed:', responseText);
+            alert('Registration failed. Please check the console for more details.');
         }
     } catch (error) {
         console.error('Registration error:', error);
