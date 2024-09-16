@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
@@ -43,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'tx_ref' => $tx_ref,
         'amount' => $annual_dues,
         'currency' => 'NGN',
-        'redirect_url' => 'https://yourdomain.com/payment-callback.php',
+        'redirect_url' => 'https://jcda.com.ng/dashboard/public/payment-callback.php',
         'payment_options' => 'card,banktransfer',
         'meta' => [
             'payment_id' => $payment_id
