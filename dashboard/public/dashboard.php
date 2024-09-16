@@ -10,30 +10,18 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Temporarily disable database checks for UI editing
-// $user_id = $_SESSION['user_id'];
-// $username = $_SESSION['username'];
+$user_id = $_SESSION['user_id'];
+$username = $_SESSION['username'];
 
 // Fetch user profile information
-// $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
-// $stmt->execute([$user_id]);
-// $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$profile = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fetch latest payment information
-// $stmt = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC LIMIT 1");
-// $stmt->execute([$user_id]);
-// $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// Temporary mock data for UI editing
-$username = "John Doe";
-$profile = [
-    'full_name' => 'John Doe',
-    'occupation' => 'Software Developer'
-];
-$latest_payment = [
-    'payment_date' => '2023-10-01',
-    'amount' => 100.00,
-    'payment_status' => 'completed'
-];
+$stmt = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC LIMIT 1");
+$stmt->execute([$user_id]);
+$latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -128,6 +116,9 @@ $latest_payment = [
             align-items: center;
             margin-bottom: 20px;
         }
+        .header h1 {
+            font-size: 2rem; /* Default font size */
+        }
         .user-profile {
             display: flex;
             align-items: center;
@@ -166,8 +157,7 @@ $latest_payment = [
                 margin-left: 100px; /* Adjusted for expanded sidebar */
             }
             .header h1 {
-                font-size: 1.2rem;
-                margin-top: 0.8rem;
+                font-size: 1.5rem; /* Reduced font size for mobile */
             }
         }
     </style>
@@ -189,7 +179,10 @@ $latest_payment = [
                 <button class="btn btn-primary" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
                 <div class="user-profile">
-                    <img src="../assets/images/useravatar.jpg" alt="User profile">
+                    <button type="button" class="btn btn-secondary">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User profile">
                 </div>
             </div>
             <section class="profile-summary">
@@ -206,7 +199,7 @@ $latest_payment = [
                 <h2>Payment Status</h2>
                 <?php if ($latest_payment): ?>
                     <p>Last Payment: <?php echo date("F j, Y", strtotime($latest_payment['payment_date'])); ?></p>
-                    <p>Amount: N<?php echo number_format($latest_payment['amount'], 2); ?></p>
+                    <p>Amount: $<?php echo number_format($latest_payment['amount'], 2); ?></p>
                     <p>Status: <?php echo ucfirst($latest_payment['payment_status']); ?></p>
                 <?php else: ?>
                     <p>No payment records found.</p>
