@@ -6,7 +6,7 @@ require_once '../includes/functions.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = sanitizeInput($_POST['username']);
+    $username = sanitize_input($_POST['username']);
     $password = $_POST['password'];
 
     if (empty($username) || empty($password)) {
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         } catch (PDOException $e) {
             $error = "An error occurred while processing your request. Please try again later.";
-            error_log($e->getMessage()); // Log the error message for debugging
+            log_error($e->getMessage()); // Log the error message for debugging
         }
     }
 }
@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
+<body>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -66,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>form>
-    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

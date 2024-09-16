@@ -6,8 +6,8 @@ require_once '../includes/functions.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = sanitizeInput($_POST['username']);
-    $email = sanitizeInput($_POST['email']);
+    $username = sanitize_input($_POST['username']);
+    $email = sanitize_input($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         } catch (PDOException $e) {
             $error = "An error occurred while processing your request. Please try again later.";
-            error_log($e->getMessage()); // Log the error message for debugging
+            log_error($e->getMessage()); // Log the error message for debugging
         }
     }
 }
