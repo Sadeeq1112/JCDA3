@@ -20,7 +20,7 @@
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            
             width: 80%;
             max-width: 1000px;
         }
@@ -136,10 +136,8 @@
                 <button type="submit">Login</button>
             </form>
             <div class="links">
-                <p>Don't have an account? <a href="#">Register here</a></p>
-                <p>Don't have your password? <a href="#">Complete Registration</a></p>
-                <p><a href="#">See all selected fellows</a></p>
-                <p><a href="#">View 3MTT Jobs</a></p>
+                <p>Don't have an account? <a href="register.php">Register here</a></p>
+                <p>Don't have your password? <a href="#">Reset Password</a></p>
             </div>
         </div>
     </div>
