@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 margin-left: 100px; /* Adjusted for expanded sidebar */
             }
             .header h1 {
-                font-size: 1rem; /* Reduced font size for mobile */
+                font-size: 1.2rem; /* Reduced font size for mobile */
             }
         }
     </style>
