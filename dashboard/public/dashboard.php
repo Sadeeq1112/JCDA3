@@ -168,10 +168,10 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             <h2>JCDA</h2>
             <ul>
                 <li><a href="#" class="active"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
-                <li><a href="profile.php"><i class="fas fa-user sidebar-icon"></i> <span class="sidebar-text">Edit Profile</span></a></li>
-                <li><a href="card.php"><i class="fas fa-id-card sidebar-icon"></i> <span class="sidebar-text">Membership Card</span></a></li>
-                <li><a href="payment.php"><i class="fas fa-money-bill sidebar-icon"></i> <span class="sidebar-text">Pay Dues</span></a></li>
-                <li><a href="logout.php"><i class="fas fa-sign-out-alt sidebar-icon"></i> <span class="sidebar-text">Logout</span></a></li>
+                <li><a href="../profile.php"><i class="fas fa-user sidebar-icon"></i> <span class="sidebar-text">Edit Profile</span></a></li>
+                <li><a href="../card.php"><i class="fas fa-id-card sidebar-icon"></i> <span class="sidebar-text">Membership Card</span></a></li>
+                <li><a href="../payment.php"><i class="fas fa-money-bill sidebar-icon"></i> <span class="sidebar-text">Pay Dues</span></a></li>
+                <li><a href="../logout.php"><i class="fas fa-sign-out-alt sidebar-icon"></i> <span class="sidebar-text">Logout</span></a></li>
             </ul>
         </div>
         <div class="main-content" id="mainContent">
@@ -179,10 +179,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                 <button class="btn btn-primary" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
                 <div class="user-profile">
-                    <button type="button" class="btn btn-secondary">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <img src="https://via.placeholder.com/40" class="rounded-circle" alt="User profile">
+                    <img src="../assets/images/useravatar.jpg" alt="User profile">
                 </div>
             </div>
             <section class="profile-summary">
