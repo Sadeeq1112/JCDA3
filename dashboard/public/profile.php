@@ -3,6 +3,11 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
+// Start session if not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -10,7 +15,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$username = $_SESSION['username']; // Ensure $username is defined
+$username = $_SESSION['username'];
 
 // Fetch user profile information
 $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
@@ -218,27 +223,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php if (isset($success)): ?>
                     <div class="alert alert-success"><?php echo $success; ?></div>
                 <?php endif; ?>
-                <form id="profile-form" action="profile.php" method="POST">
+                <form action="profile.php" method="POST">
                     <div class="form-group">
                         <label for="full_name">Full Name:</label>
-                        <input type="text" id="full_name" name="full_name" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required readonly>
+                        <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="address">Address:</label>
-                        <textarea id="address" name="address" class="form-control profile-field" readonly><?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?></textarea>
+                        <textarea id="address" name="address" class="form-control"><?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?></textarea>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone:</label>
-                        <input type="tel" id="phone" name="phone" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>" readonly>
+                        <input type="tel" id="phone" name="phone" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="date_of_birth">Date of Birth:</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control profile-field" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" readonly>
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="occupation">Occupation:</label>
-                        <input type="text" id="occupation" name="occupation" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>" readonly>
+                        <input type="text" id="occupation" name="occupation" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>">
                     </div>
-                    <button type="submit" id="save-profile" class="btn btn-primary" style="display: none;">Save Profile</button>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
-                <button id="edit-profile" class="btn btn-secondary mt-3">
+                <a href="dashboard.php" class="btn btn-secondary mt-3">Back to Dashboard</a>
+            </section>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('expanded');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
+    </script>
+</body>
+</html>
