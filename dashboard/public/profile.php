@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+$username = $_SESSION['username']; // Ensure $username is defined
 
 // Fetch user profile information
 $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
@@ -217,42 +218,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php if (isset($success)): ?>
                     <div class="alert alert-success"><?php echo $success; ?></div>
                 <?php endif; ?>
-                <form action="profile.php" method="POST">
+                <form id="profile-form" action="profile.php" method="POST">
                     <div class="form-group">
                         <label for="full_name">Full Name:</label>
-                        <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required>
+                        <input type="text" id="full_name" name="full_name" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required readonly>
                     </div>
                     <div class="form-group">
                         <label for="address">Address:</label>
-                        <textarea id="address" name="address" class="form-control"><?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?></textarea>
+                        <textarea id="address" name="address" class="form-control profile-field" readonly><?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?></textarea>
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone:</label>
-                        <input type="tel" id="phone" name="phone" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>">
+                        <input type="tel" id="phone" name="phone" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>" readonly>
                     </div>
                     <div class="form-group">
                         <label for="date_of_birth">Date of Birth:</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>">
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control profile-field" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" readonly>
                     </div>
                     <div class="form-group">
                         <label for="occupation">Occupation:</label>
-                        <input type="text" id="occupation" name="occupation" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>">
+                        <input type="text" id="occupation" name="occupation" class="form-control profile-field" value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>" readonly>
                     </div>
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <button type="submit" id="save-profile" class="btn btn-primary" style="display: none;">Save Profile</button>
                 </form>
-                <a href="dashboard.php" class="btn btn-secondary mt-3">Back to Dashboard</a>
-            </section>
-        </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        document.getElementById('toggleSidebar').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('hidden');
-            document.getElementById('sidebar').classList.toggle('expanded');
-            document.getElementById('mainContent').classList.toggle('expanded');
-        });
-    </script>
-</body>
-</html>
+                <button id="edit-profile" class="btn btn-secondary mt-3">
