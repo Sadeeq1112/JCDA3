@@ -20,9 +20,9 @@
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
-            
             width: 80%;
             max-width: 1000px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .left-side {
             background-color: #ffe6e6;
@@ -31,10 +31,14 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
         }
         .right-side {
             padding: 40px;
             width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .logo {
             margin-bottom: 20px;
@@ -75,6 +79,32 @@
         .error {
             color: red;
             margin-bottom: 15px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 90%;
+            }
+            .left-side, .right-side {
+                width: 100%;
+                padding: 20px;
+            }
+            .left-side {
+                display: none; /* Hide the left side on mobile */
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                border-radius: 0;
+            }
+            .right-side {
+                padding: 20px;
+            }
+            input, button {
+                padding: 15px;
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -117,7 +147,7 @@
     <div class="container">
         <div class="left-side">
             <div class="logo">
-                <img src="/api/placeholder/100/50" alt="3MTT Logo">
+                <img src="/api/placeholder/100/50" alt="JCDA Logo">
             </div>
             <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
         </div>
@@ -137,7 +167,7 @@
             </form>
             <div class="links">
                 <p>Don't have an account? <a href="register.php">Register here</a></p>
-                <p>Don't have your password? <a href="#">Reset Password</a></p>
+                <p>Forgot your password? <a href="#">Reset Password</a></p>
             </div>
         </div>
     </div>
