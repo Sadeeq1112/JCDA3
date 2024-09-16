@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 margin-left: 100px; /* Adjusted for expanded sidebar */
             }
             .header h1 {
-                font-size: 1.5rem; /* Reduced font size for mobile */
+                font-size: 1rem; /* Reduced font size for mobile */
             }
         }
     </style>
@@ -209,10 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button class="btn btn-primary" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
                 <div class="user-profile">
-                    <button type="button" class="btn btn-secondary">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <img src="assets/images/user-avatar.jpg" class="rounded-circle" alt="User profile">
+                    <img src="../assets/images/useravatar.jpg" alt="User profile">
                 </div>
             </div>
             <section class="profile-summary">
