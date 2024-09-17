@@ -3,33 +3,38 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
-$error = '';
+session_start();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = sanitize_input($_POST['username']);
-    $password = $_POST['password'];
+if (isset($_SESSION['user_id'])) {
+    $error = "You are already logged in.";
+} else {
+    $error = '';
 
-    if (empty($username) || empty($password)) {
-        $error = "Both username and password are required.";
-    } else {
-        try {
-            // Check if username exists
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-            $stmt->execute([$username, $username]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $username = sanitize_input($_POST['username']);
+        $password = $_POST['password'];
 
-            if ($user && password_verify($password, $user['password'])) {
-                session_start();
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                header("Location: dashboard.php");
-                exit;
-            } else {
-                $error = "Invalid username or password.";
+        if (empty($username) || empty($password)) {
+            $error = "Both username and password are required.";
+        } else {
+            try {
+                // Check if username exists
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+                $stmt->execute([$username, $username]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user && password_verify($password, $user['password'])) {
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
+                    header("Location: dashboard.php");
+                    exit;
+                } else {
+                    $error = "Invalid username or password.";
+                }
+            } catch (PDOException $e) {
+                $error = "An error occurred while processing your request. Please try again later.";
+                log_error($e->getMessage()); // Log the error message for debugging
             }
-        } catch (PDOException $e) {
-            $error = "An error occurred while processing your request. Please try again later.";
-            log_error($e->getMessage()); // Log the error message for debugging
         }
     }
 }
@@ -148,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="container">
         <div class="left-side">
             <div class="logo">
-                <img src="/api/placeholder/100/50" alt="JCDA Logo">
+                <img src="/JCDA.png" alt="JCDA Logo">
             </div>
             <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
         </div>
@@ -158,18 +163,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <?php if (!empty($error)): ?>
                 <div class="error"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
-            <form action="login.php" method="POST">
-                <input type="text" name="username" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <label>
-                    <input type="checkbox" name="remember"> Remember Me
-                </label>
-                <button type="submit">Login</button>
-            </form>
-            <div class="links">
-                <p>Don't have an account? <a href="register.php">Register here</a></p>
-                <p>Forgot your password? <a href="#">Reset Password</a></p>
-            </div>
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                <form action="login.php" method="POST">
+                    <input type="text" name="username" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <label>
+                        <input type="checkbox" name="remember"> Remember Me
+                    </label>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="links">
+                    <p>Don't have an account? <a href="register.php">Register here</a></p>
+                    <p>Forgot your password? <a href="#">Reset Password</a></p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </body>
