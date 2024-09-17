@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <!-- Favicons -->
-    <link rel="shortcut icon" href="/jasawa (3).png">
+    <link rel="shortcut icon" href="/JCDA.png">
 
     <!-- FONTS -->
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Questrial:100,200,300,400,400italic,500,700,700italic,900'>
@@ -43,7 +43,12 @@
                         <div class="column one">
                             <div class="top_bar_left clearfix">
                                 <div class="logo">
-                                    <a id="logo" href="/index.html" title="Jasawa" data-height="71" data-padding="15"><img class="logo-main scale-with-grid" src="/jasawa (3).png" data-retina="/jasawa (3).png" data-height="71"><img class="logo-sticky scale-with-grid" src="/jasawa (3).png" data-retina="/jasawa (3).png" data-height="71"><img class="logo-mobile scale-with-grid" src="/jasawa (3).png" data-retina="/jasawa (3).png" data-height="71"><img class="logo-mobile-sticky scale-with-grid" src="/jasawa (3).png" data-retina="/jasawa (3).png" data-height="71"></a>
+                                    <a id="logo" href="/index.html" title="Jasawa" data-height="71" data-padding="15">
+                                        <img class="logo-main scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
+                                        <img class="logo-sticky scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
+                                        <img class="logo-mobile scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
+                                        <img class="logo-mobile-sticky scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
+                                    </a>
                                 </div>
                                 <div class="menu_wrapper">
                                     <nav id="menu">
@@ -69,11 +74,10 @@
                                             <li>
                                                 <a href="content/charity3/contact"><span>Contact</span></a>
                                             </li>
-                                         
                                         </ul>
-                                    </nav><a class="responsive-menu-toggle" href="#"><i class="icon-menu-fine"></i></a>
+                                    </nav>
+                                    <a class="responsive-menu-toggle" href="#"><i class="icon-menu-fine"></i></a>
                                 </div>
-
                             </div>
                             <div class="top_bar_right">
                                 <div class="top_bar_right_wrapper">
@@ -85,270 +89,247 @@
                 </div>
             </header>
         </div>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCDA Recent Pictures</title>
-    <style>
-  
-       
-        h1 {
-            text-align: center;
-            color: black;
-           
-        }
-        .subtitle1 {
-            text-align: center;
-            color: black;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
-        .filter-buttons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .filter-button {
-            background-color: none;
-            border-color: white;
-            padding: 10px 20px;
-            margin: 0 5px;
-            cursor: pointer;
-            
-        }
-        .filter-button:hover, .filter-button.active {
-            color: black;
-        }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            grid-gap: 20px;
-        }
-        .gallery-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-        .gallery-item:hover img {
-            transform: scale(1.05);
-        }        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            padding-top: 60px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.9);
-            animation: fadeIn 0.5s;
-        }
-        
-        .modal-content {
-            margin: auto;
-            display: block;
-            width: 80%;
-            max-width: 700px;
-            animation: zoomIn 0.5s;
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 35px;
-            color: #fff;
-            font-size: 40px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: #bbb;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes zoomIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
-    </style>
-</head>
-<body>
-       <div class="container">
-        <h1 class="teamh1">Gallery</h1>
-        <hr class="teamhr">
-        <p class="subtitle1">Explore our gallery to see the impactful moments and events captured through the lens. <br>Witness the dedication and efforts of JCDA in fostering community development and unity.</p>
-        <!-- Gallery content will go here -->
-        <!-- <div class="filter-buttons">
-            <button class="filter-button active" data-filter="all">ALL</button>
-            <button class="filter-button" data-filter="branding">Recent</button>
-            <button class="filter-button" data-filter="website">Event</button>
-            
-        </div> -->
-               <div class="gallery" id="gallery">
-            <!-- Gallery items will be dynamically added here -->
-        </div>
-        
-        <!-- Modal for expanded image -->
-        <div id="modal" class="modal">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="modal-img">
-        </div>
-        
-        <script>
-            const galleryData = [
-                { src: 'gallery images/img4.webp', category: 'Recent' },
-                { src: 'gallery images/f37c04d1-19c4-4959-930a-0c11c58d8922.JPG', category: 'Recent' },
-                { src: 'gallery images/da8c3d6a-5738-4261-be3e-558bfccdccdc.JPG', category: 'Recent' },
-                { src: 'gallery images/d4267191-74cf-426e-9b47-c19bc2e38f4e 2.JPG', category: 'Recent' },
-                { src: 'gallery images/c72ed029-5058-4979-9f4d-05a683fdf07d.JPG', category: 'Recent' },
-                { src: 'gallery images/bccdf4a2-b303-4003-8ba0-6059c211e877.JPG', category: 'Recent' },
-                { src: 'gallery images/bcb3f62e-3121-4f62-a865-902c5e3bf7db.JPG', category: 'Recent' },
-                { src: 'gallery images/b7185bb0-7c8d-4aca-854e-97087e12adad.JPG', category: 'Recent' },
-                { src: 'gallery images/acc6dec7-5e86-44fa-8ec5-02b31698069b.JPG', category: 'Recent' },
-                { src: 'gallery images/aacdbc62-8aad-4679-b08d-06b783c904f5.JPG', category: 'Recent' },
-                { src: 'gallery images/aa3f0ddf-e23e-4525-816d-71b11830c1fa 2.JPG', category: 'Recent' },
-                { src: 'gallery images/a43dfd45-33ab-4f07-b778-3eecae11ec85.JPG', category: 'Recent' },
-                { src: 'gallery images/8597724e-0b9c-4f8e-80cc-8cef0c59ef69.JPG', category: 'Recent' },
-                { src: 'gallery images/46888a8f-095a-4fcc-b765-44954e268567.JPG', category: 'Recent' },
-                { src: 'gallery images/16369b20-d4a2-4c3b-bf9f-4f5f3d5eef94.JPG', category: 'Recent' },
-                { src: 'gallery images/4493eeda-9cb0-45cb-930f-0ed8d36e8f9a.JPG', category: 'Recent' },
-                { src: 'gallery images/887eaeef-44a0-4319-a91d-ddb6b361842b.JPG', category: 'Recent' },
-                { src: 'gallery images/352bec6c-02d8-4a3d-9592-f098bf730547 2.JPG', category: 'Recent' },
-                { src: 'gallery images/31cea934-c4e9-4d30-9f0b-8dd8f5cdf877 2.JPG', category: 'Recent' },
-                { src: 'gallery images/9f1d86ae-ff56-4dcc-a492-2bdfd1ec15f1.JPG', category: 'Recent' },
-                { src: 'gallery images/9dd20b5d-cc2e-4fbe-8a68-76836e46b83c.JPG', category: 'Recent' },
-                { src: 'gallery images/5d4b5822-b7f4-4654-a7bf-0465cc9907b6.JPG', category: 'Recent' },
-                { src: 'gallery images/4f5c2674-2994-4a54-b778-20b4bd68a647.JPG', category: 'Recent' },
-                { src: 'gallery images/01e0f7cc-2ef7-47ed-9c9c-8f7f588c1dda.JPG', category: 'Recent' }
-            ];
-        
-            const gallery = document.getElementById('gallery');
-            const filterButtons = document.querySelectorAll('.filter-button');
-            const modal = document.getElementById('modal');
-            const modalImg = document.getElementById('modal-img');
-            const closeModal = document.getElementsByClassName('close')[0];
-        
-            function createGalleryItem(item) {
-                const div = document.createElement('div');
-                div.className = `gallery-item ${item.category}`;
-                const img = document.createElement('img');
-                img.src = item.src;
-                img.alt = `JCDA ${item.category} image`;
-                img.onclick = () => {
-                    modal.style.display = 'block';
-                    modalImg.src = item.src;
-                };
-                div.appendChild(img);
-                return div;
-            }
-        
-            function populateGallery(filter = 'all') {
-                gallery.innerHTML = '';
-                galleryData.forEach(item => {
-                    if (filter === 'all' || item.category === filter) {
-                        gallery.appendChild(createGalleryItem(item));
-                    }
-                });
-            }
-        
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active');
-                    populateGallery(button.getAttribute('data-filter'));
-                });
-            });
-        
-            closeModal.onclick = () => {
-                modal.style.display = 'none';
-            };
-        
-            window.onclick = (event) => {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>JCDA Recent Pictures</title>
+            <style>
+                h1 {
+                    text-align: center;
+                    color: black;
                 }
-            };
-        
-            populateGallery();
-        </script>
-  <footer id="Footer" class="clearfix">
-    <div class="widgets_wrapper">
-        <div class="container">
-            <div class="column one">
-                <aside class="widget_text widget widget_custom_html">
-                    <div class="textwidget custom-html-widget">
-                        <div class="image_frame image_item no_link scale-with-grid aligncenter no_border">
-                            <div class="image_wrapper"><img class="scale-with-grid" src="/jasawa.png" width="200px" height="200px">
+                .subtitle1 {
+                    text-align: center;
+                    color: black;
+                    margin-bottom: 20px;
+                    margin-top: 10px;
+                }
+                .filter-buttons {
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 20px;
+                }
+                .filter-button {
+                    background-color: none;
+                    border-color: white;
+                    padding: 10px 20px;
+                    margin: 0 5px;
+                    cursor: pointer;
+                }
+                .filter-button:hover, .filter-button.active {
+                    color: black;
+                }
+                .gallery {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                    grid-gap: 20px;
+                }
+                .gallery-item {
+                    position: relative;
+                    overflow: hidden;
+                    border-radius: 5px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                .gallery-item img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.3s;
+                }
+                .gallery-item:hover img {
+                    transform: scale(1.05);
+                }
+                /* Modal styles */
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1000;
+                    padding-top: 60px;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: auto;
+                    background-color: rgba(0, 0, 0, 0.9);
+                    animation: fadeIn 0.5s;
+                }
+                .modal-content {
+                    margin: auto;
+                    display: block;
+                    width: 80%;
+                    max-width: 700px;
+                    animation: zoomIn 0.5s;
+                }
+                .close {
+                    position: absolute;
+                    top: 15px;
+                    right: 35px;
+                    color: #fff;
+                    font-size: 40px;
+                    font-weight: bold;
+                    transition: 0.3s;
+                }
+                .close:hover,
+                .close:focus {
+                    color: #bbb;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                @keyframes zoomIn {
+                    from { transform: scale(0); }
+                    to { transform: scale(1); }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1 class="teamh1">Gallery</h1>
+                <hr class="teamhr">
+                <p class="subtitle1">Explore our gallery to see the impactful moments and events captured through the lens. <br>Witness the dedication and efforts of JCDA in fostering community development and unity.</p>
+                <!-- Gallery content will go here -->
+                <!-- <div class="filter-buttons">
+                    <button class="filter-button active" data-filter="all">ALL</button>
+                    <button class="filter-button" data-filter="branding">Recent</button>
+                    <button class="filter-button" data-filter="website">Event</button>
+                </div> -->
+                <div class="gallery" id="gallery">
+                    <!-- Gallery items will be dynamically added here -->
+                </div>
+                <!-- Modal for expanded image -->
+                <div id="modal" class="modal">
+                    <span class="close">&times;</span>
+                    <img class="modal-content" id="modal-img">
+                </div>
+                <script>
+                    const galleryData = [
+                        { src: 'gallery images/img4.webp', category: 'Recent' },
+                        { src: 'gallery images/f37c04d1-19c4-4959-930a-0c11c58d8922.JPG', category: 'Recent' },
+                        { src: 'gallery images/da8c3d6a-5738-4261-be3e-558bfccdccdc.JPG', category: 'Recent' },
+                        { src: 'gallery images/d4267191-74cf-426e-9b47-c19bc2e38f4e 2.JPG', category: 'Recent' },
+                        { src: 'gallery images/c72ed029-5058-4979-9f4d-05a683fdf07d.JPG', category: 'Recent' },
+                        { src: 'gallery images/bccdf4a2-b303-4003-8ba0-6059c211e877.JPG', category: 'Recent' },
+                        { src: 'gallery images/bcb3f62e-3121-4f62-a865-902c5e3bf7db.JPG', category: 'Recent' },
+                        { src: 'gallery images/b7185bb0-7c8d-4aca-854e-97087e12adad.JPG', category: 'Recent' },
+                        { src: 'gallery images/acc6dec7-5e86-44fa-8ec5-02b31698069b.JPG', category: 'Recent' },
+                        { src: 'gallery images/aacdbc62-8aad-4679-b08d-06b783c904f5.JPG', category: 'Recent' },
+                        { src: 'gallery images/aa3f0ddf-e23e-4525-816d-71b11830c1fa 2.JPG', category: 'Recent' },
+                        { src: 'gallery images/a43dfd45-33ab-4f07-b778-3eecae11ec85.JPG', category: 'Recent' },
+                        { src: 'gallery images/8597724e-0b9c-4f8e-80cc-8cef0c59ef69.JPG', category: 'Recent' },
+                        { src: 'gallery images/46888a8f-095a-4fcc-b765-44954e268567.JPG', category: 'Recent' },
+                        { src: 'gallery images/16369b20-d4a2-4c3b-bf9f-4f5f3d5eef94.JPG', category: 'Recent' },
+                        { src: 'gallery images/4493eeda-9cb0-45cb-930f-0ed8d36e8f9a.JPG', category: 'Recent' },
+                        { src: 'gallery images/887eaeef-44a0-4319-a91d-ddb6b361842b.JPG', category: 'Recent' },
+                        { src: 'gallery images/352bec6c-02d8-4a3d-9592-f098bf730547 2.JPG', category: 'Recent' },
+                        { src: 'gallery images/31cea934-c4e9-4d30-9f0b-8dd8f5cdf877 2.JPG', category: 'Recent' },
+                        { src: 'gallery images/9f1d86ae-ff56-4dcc-a492-2bdfd1ec15f1.JPG', category: 'Recent' },
+                        { src: 'gallery images/9dd20b5d-cc2e-4fbe-8a68-76836e46b83c.JPG', category: 'Recent' },
+                        { src: 'gallery images/5d4b5822-b7f4-4654-a7bf-0465cc9907b6.JPG', category: 'Recent' },
+                        { src: 'gallery images/4f5c2674-2994-4a54-b778-20b4bd68a647.JPG', category: 'Recent' },
+                        { src: 'gallery images/01e0f7cc-2ef7-47ed-9c9c-8f7f588c1dda.JPG', category: 'Recent' }
+                    ];
+                    const gallery = document.getElementById('gallery');
+                    const filterButtons = document.querySelectorAll('.filter-button');
+                    const modal = document.getElementById('modal');
+                    const modalImg = document.getElementById('modal-img');
+                    const closeModal = document.getElementsByClassName('close')[0];
+                    function createGalleryItem(item) {
+                        const div = document.createElement('div');
+                        div.className = `gallery-item ${item.category}`;
+                        const img = document.createElement('img');
+                        img.src = item.src;
+                        img.alt = `JCDA ${item.category} image`;
+                        img.onclick = () => {
+                            modal.style.display = 'block';
+                            modalImg.src = item.src;
+                        };
+                        div.appendChild(img);
+                        return div;
+                    }
+                    function populateGallery(filter = 'all') {
+                        gallery.innerHTML = '';
+                        galleryData.forEach(item => {
+                            if (filter === 'all' || item.category === filter) {
+                                gallery.appendChild(createGalleryItem(item));
+                            }
+                        });
+                    }
+                    filterButtons.forEach(button => {
+                        button.addEventListener('click', () => {
+                            filterButtons.forEach(btn => btn.classList.remove('active'));
+                            button.classList.add('active');
+                            populateGallery(button.getAttribute('data-filter'));
+                        });
+                    });
+                    closeModal.onclick = () => {
+                        modal.style.display = 'none';
+                    };
+                    window.onclick = (event) => {
+                        if (event.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    };
+                    populateGallery();
+                </script>
+                <footer id="Footer" class="clearfix">
+                    <div class="widgets_wrapper">
+                        <div class="container">
+                            <div class="column one">
+                                <aside class="widget_text widget widget_custom_html">
+                                    <div class="textwidget custom-html-widget">
+                                        <div class="image_frame image_item no_link scale-with-grid aligncenter no_border">
+                                            <div class="image_wrapper"><img class="scale-with-grid" src="/JCDA.png" width="200px" height="200px">
+                                            </div>
+                                        </div>
+                                        <hr class="no_line" style="margin:0 auto 20px">
+                                        <p style="text-align: center; padding: 0 10%; text-align: center;">
+                                            The JASAWA Action Plan is a comprehensive five-year peace-building and development initiative designed to address the complex socio-economic challenges and security issues facing JASAWA. Our vision is to create a peaceful JCDA, where prosperity and opportunities abound, and every citizen is empowered to contribute to a thriving and united Nigeria.
+                                        </p>
+                                    </div>
+                                </aside>
                             </div>
                         </div>
-                        <hr class="no_line" style="margin:0 auto 20px">
-                        <p style="text-align: center; padding: 0 10%; text-align: center;">
-                            The JASAWA Action Plan is a comprehensive five-year peace-building and development initiative designed to address the complex socio-economic challenges and security issues facing JASAWA. Our vision is to create a peaceful JCDA, where prosperity and opportunities abound, and every citizen is empowered to contribute to a thriving and united Nigeria.
-                        </p>
                     </div>
-                </aside>
+                    <div class="footer_copy">
+                        <div class="container">
+                            <div class="column one">
+                                <a id="back_to_top" class="button button_js" href><i class="icon-up-open-big"></i></a>
+                                <div class="copyright">
+                                    &copy; 2024 JASAWA Community Development Association - All rights reserved
+                                </div>
+                                <nav id="social-menu" class="menu-footer-container">
+                                    <ul id="menu-footer" class="social-menu">
+                                        <li><a href="#">About Us</a></li>
+                                        <li><a href="#">Activities</a></li>
+                                        <li><a href="#">Contact</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
             </div>
-        </div>
-    </div>
-    <div class="footer_copy">
-        <div class="container">
-            <div class="column one">
-                <a id="back_to_top" class="button button_js" href><i class="icon-up-open-big"></i></a>
-                <div class="copyright">
-                    &copy; 2024 JASAWA Community Development Association - All rights reserved
+            <div id="Side_slide" class="right dark" data-width="250">
+                <div class="close-wrapper">
+                    <a href="#" class="close"><i class="icon-cancel-fine"></i></a>
                 </div>
-                <nav id="social-menu" class="menu-footer-container">
-                    <ul id="menu-footer" class="social-menu">
-                       <li><a href="#">About Us</a></li>
-                       <li><a href="#">Activities</a></li>
-                       <li><a href="#">Contact</a></li>
-                    </ul>
-                </nav>
+                <div class="extras">
+                    <a href="#" class="action_button">Donate now</a>
+                    <div class="extras-wrapper"></div>
+                </div>
+                <div class="menu_wrapper"></div>
             </div>
-        </div>
-</footer>
-</div>
-<div id="Side_slide" class="right dark" data-width="250">
-<div class="close-wrapper">
-    <a href="#" class="close"><i class="icon-cancel-fine"></i></a>
-</div>
-<div class="extras">
-    <a href="#" class="action_button">Donate now</a>
-    <div class="extras-wrapper"></div>
-</div>
-<div class="menu_wrapper"></div>
-</div>
-<div id="body_overlay"></div>
-
-
-<!-- JS -->
-<script src="../../js/jquery-2.1.4.min.js"></script>
-
-<script src="../../js/mfn.menu.js"></script>
-<script src="../../js/jquery.plugins.js"></script>
-<script src="../../js/jquery.jplayer.min.js"></script>
-<script src="../../js/animations/animations.js"></script>
-<script src="../../js/translate3d.js"></script>
-<script src="../../js/scripts.js"></script>
-
-
-</body>
-
-</html>
+            <div id="body_overlay"></div>
+            <!-- JS -->
+            <script src="../../js/jquery-2.1.4.min.js"></script>
+            <script src="../../js/mfn.menu.js"></script>
+            <script src="../../js/jquery.plugins.js"></script>
+            <script src="../../js/jquery.jplayer.min.js"></script>
+            <script src="../../js/animations/animations.js"></script>
+            <script src="../../js/translate3d.js"></script>
+            <script src="../../js/scripts.js"></script>
+        </body>
+    </html>
