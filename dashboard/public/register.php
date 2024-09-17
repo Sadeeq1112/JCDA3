@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Invalid email format.";
     } elseif ($password !== $confirm_password) {
         $error = "Passwords do not match.";
-    } else {d
+    } else {
         try {
             // Check if username or email already exists
             $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
