@@ -26,16 +26,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($stmt->rowCount() > 0) {
                 $error = "Username or email already exists.";
             } else {
+                // Generate OTP
+                $otp = rand(100000, 999999);
+                $otp_expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
                 // Hash the password
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                // Insert new user
-                $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-                if ($stmt->execute([$username, $email, $hashed_password])) {
-                    $_SESSION['user_id'] = $pdo->lastInsertId();
-                    $_SESSION['username'] = $username;
-                    header("Location: dashboard.php");
-                    exit;
+                // Insert pending registration
+                $stmt = $pdo->prepare("INSERT INTO pending_registrations (username, email, password, otp, otp_expiry) VALUES (?, ?, ?, ?, ?)");
+                if ($stmt->execute([$username, $email, $hashed_password, $otp, $otp_expiry])) {
+                    // Send OTP to user's email
+                    if (send_otp_email($email, $otp)) {
+                        $_SESSION['pending_email'] = $email;
+                        header("Location: verify_otp.php");
+                        exit;
+                    } else {
+                        $error = "Failed to send verification email. Please try again.";
+                    }
                 } else {
                     $error = "Registration failed. Please try again.";
                 }
@@ -45,6 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             log_error($e->getMessage()); // Log the error message for debugging
         }
     }
+}
+
+// Function to send OTP email
+function send_otp_email($email, $otp) {
+    $subject = "Email Verification for JCDA";
+    $message = "Your OTP for email verification is: $otp\nThis OTP will expire in 15 minutes.";
+    $headers = "From: noreply@jcda.com";
+
+    return mail($email, $subject, $message, $headers);
 }
 ?>
 
