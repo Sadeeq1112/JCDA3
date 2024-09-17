@@ -35,10 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         if ($profile) {
             // Update existing profile
-            $stmt = $pdo->prepare("UPDATE profiles SET full_name = ?, address = ?, phone = ?, date_of_birth = ?, occupation = ? WHERE user_id = ?");
+            $stmt = $pdo->prepare("UPDATE profiles SET full_name = ?, address = ?, phone = ?, date_of_birth = ?, occupation = ?, updated = 1 WHERE user_id = ?");
         } else {
             // Insert new profile
-            $stmt = $pdo->prepare("INSERT INTO profiles (full_name, address, phone, date_of_birth, occupation, user_id) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO profiles (full_name, address, phone, date_of_birth, occupation, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, 1)");
         }
 
         if ($stmt->execute([$full_name, $address, $phone, $date_of_birth, $occupation, $user_id])) {
@@ -52,6 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
+
+// Determine if the fields should be read-only
+$readonly = $profile && $profile['updated'] == 1;
 ?>
 
 <!DOCTYPE html>
@@ -173,6 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 10px;
             color: #666;
         }
+        .readonly {
+            background-color: #e9ecef;
+        }
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%); /* Hide sidebar by default */
@@ -231,11 +237,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="phone">Phone:</label>
-                        <input type="tel" id="phone" name="phone" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>">
+                        <input type="tel" id="phone" name="phone" class="form-control <?php echo $readonly ? 'readonly' : ''; ?>" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>" <?php echo $readonly ? 'readonly' : ''; ?>>
                     </div>
                     <div class="form-group">
                         <label for="date_of_birth">Date of Birth:</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>">
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control <?php echo $readonly ? 'readonly' : ''; ?>" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" <?php echo $readonly ? 'readonly' : ''; ?>>
                     </div>
                     <div class="form-group">
                         <label for="occupation">Occupation:</label>
