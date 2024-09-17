@@ -3,6 +3,16 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
+// Add the 'updated' column if it doesn't exist
+try {
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN updated TINYINT(1) DEFAULT 0");
+} catch (PDOException $e) {
+    // Ignore the error if the column already exists
+    if ($e->getCode() != '42S21') {
+        throw $e;
+    }
+}
+
 // Start session if not already started
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
