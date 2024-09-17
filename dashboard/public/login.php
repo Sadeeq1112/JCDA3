@@ -1,3 +1,39 @@
+<?php
+require_once '../includes/config.php';
+require_once '../includes/db.php';
+require_once '../includes/functions.php';
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = sanitize_input($_POST['username']);
+    $password = $_POST['password'];
+
+    if (empty($username) || empty($password)) {
+        $error = "Both username and password are required.";
+    } else {
+        try {
+            // Check if username exists
+            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $username]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($password, $user['password'])) {
+                session_start();
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                header("Location: dashboard.php");
+                exit;
+            } else {
+                $error = "Invalid username or password.";
+            }
+        } catch (PDOException $e) {
+            $error = "An error occurred while processing your request. Please try again later.";
+            log_error($e->getMessage()); // Log the error message for debugging
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,41 +145,6 @@
     </style>
 </head>
 <body>
-    <?php
-    require_once '../includes/config.php';
-    require_once '../includes/db.php';
-    require_once '../includes/functions.php';
-
-    $error = '';
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $username = sanitize_input($_POST['username']);
-        $password = $_POST['password'];
-
-        if (empty($username) || empty($password)) {
-            $error = "Both username and password are required.";
-        } else {
-            try {
-                // Check if username exists
-                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-                $stmt->execute([$username, $username]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($user && password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    header("Location: dashboard.php");
-                    exit;
-                } else {
-                    $error = "Invalid username or password.";
-                }
-            } catch (PDOException $e) {
-                $error = "An error occurred while processing your request. Please try again later.";
-                log_error($e->getMessage()); // Log the error message for debugging
-            }
-        }
-    }
-    ?>
     <div class="container">
         <div class="left-side">
             <div class="logo">
