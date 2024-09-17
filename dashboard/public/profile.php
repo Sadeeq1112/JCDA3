@@ -211,7 +211,9 @@ $readonly = $profile && $profile['updated'] == 1;
 <body>
     <div class="dashboard">
         <div class="sidebar hidden" id="sidebar">
-            <h2>JCDA</h2>
+            <div class="logo">
+                <img src="/JCDA.png" alt="JCDA Logo" style="width: 100%; height: auto;">
+            </div>
             <ul>
                 <li><a href="dashboard.php"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
                 <li><a href="profile.php" class="active"><i class="fas fa-user sidebar-icon"></i> <span class="sidebar-text">Edit Profile</span></a></li>
