@@ -2,6 +2,10 @@
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
+require '../vendor/autoload.php'; // Include PHPMailer
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $error = '';
 
@@ -55,13 +59,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Function to send OTP email
+// Function to send OTP email using PHPMailer
 function send_otp_email($email, $otp) {
-    $subject = "Email Verification for JCDA";
-    $message = "Your OTP for email verification is: $otp\nThis OTP will expire in 15 minutes.";
-    $headers = "From: noreply@jcda.com";
+    $mail = new PHPMailer(true);
 
-    return mail($email, $subject, $message, $headers);
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = SMTP_HOST;
+        $mail->SMTPAuth = true;
+        $mail->Username = SMTP_USERNAME;
+        $mail->Password = SMTP_PASSWORD;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use 'ssl' if PHPMailer version < 6.1
+        $mail->Port = SMTP_PORT;
+
+        // Recipients
+        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
+        $mail->addAddress($email);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Email Verification for JCDA';
+        $mail->Body    = "Your OTP for email verification is: $otp<br>This OTP will expire in 15 minutes.";
+        $mail->AltBody = "Your OTP for email verification is: $otp\nThis OTP will expire in 15 minutes.";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        log_error("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
 }
 ?>
 
