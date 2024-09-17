@@ -19,7 +19,7 @@ define('SMTP_PORT', 465);
 define('SMTP_USERNAME', 'noreply@jcda.com.ng');
 define('SMTP_PASSWORD', 'zZ[6oxwGFg.F');
 define('SMTP_FROM_EMAIL', 'noreply@jcda.com.ng');
-define('SMTP_FROM_NAME', 'JCDA Admin');
+define('SMTP_FROM_NAME', 'JCDA');
 
 // Session configuration
 ini_set('session.cookie_lifetime', 60 * 60 * 24 * 7); // 1 week
