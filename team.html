@@ -31,6 +31,140 @@
     <link rel='stylesheet' href='content/charity3/css/charity3.css'>
     <link rel='stylesheet' href='content/charity3/css/custom.css'>
 
+    <style>
+        .teamh1 {
+            margin-top: 150px;
+            color: black;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+        }
+
+        .teamhr {
+            width: 100px;
+            height: 3px;
+            background-color: #378349;
+            margin: 0 auto 20px;
+            border: none;
+            margin-top: 15px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1em;
+            margin-bottom: 40px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            background-color: #f8fcf8; /* Light gray with a very subtle greenish tint */
+            padding: 5rem 10rem;
+            margin: 0 5rem;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .team-member img {
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 0.5em !important;
+        }
+
+        .teamh2 {
+            font-size: 1.2em;
+            color: black;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .teamp {
+            font-size: 0.8em;
+            color: black;
+            font-family: 'Arial', sans-serif;
+            margin-top: 1px;
+            position: relative;
+            top: -35px;
+        }
+
+        .see-more-button {
+            display: none;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #378349;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .see-more {
+            display: block;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .teamh1 {
+                font-size: 2em;
+                margin-top: 100px;
+            }
+
+            .teamhr {
+                width: 80px;
+                height: 2px;
+            }
+
+            .subtitle {
+                font-size: 0.9em;
+                margin-bottom: 30px;
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 2rem;
+                margin: 0 1rem;
+            }
+
+            .team-member img {
+                width: 100%;
+                max-width: 200px;
+                height: 200px;
+            }
+
+            .teamh2 {
+                font-size: 1.2em;
+                margin-top: 2px;
+                margin-bottom: 1px; /* Add margin-bottom to create space between h2 and p */
+            }
+
+            .teamp {
+                font-size: 0.9em;
+                margin-top: 3px;
+                position: relative;
+                top: -3px;
+            }
+
+            .see-more {
+                display: none;
+            }
+
+            .see-more-button {
+                display: block;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="page style-simple button-flat layout-full-width if-zoom no-content-padding header-transparent header-fw minimalist-header-no sticky-header sticky-tb-color ab-hide subheader-both-center menu-link-color menuo-no-borders mobile-tb-center mobile-side-slide mobile-mini-mr-ll tablet-sticky mobile-header-mini mobile-sticky">
@@ -43,7 +177,7 @@
                         <div class="column one">
                             <div class="top_bar_left clearfix">
                                 <div class="logo">
-                                                                      <a id="logo" href="/index.html" title="Jasawa" data-height="71" data-padding="15">
+                                    <a id="logo" href="/index.html" title="Jasawa" data-height="71" data-padding="15">
                                         <img class="logo-main scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
                                         <img class="logo-sticky scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
                                         <img class="logo-mobile scale-with-grid" src="/JCDA.png" data-retina="/JCDA.png" data-height="71">
@@ -74,7 +208,6 @@
                                             <li>
                                                 <a href="content/charity3/contact"><span>Contact</span></a>
                                             </li>
-                                         
                                         </ul>
                                     </nav><a class="responsive-menu-toggle" href="#"><i class="icon-menu-fine"></i></a>
                                 </div>
@@ -90,111 +223,167 @@
                 </div>
             </header>
         </div>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCDA - Our Team</title>
-   
-</head>
-<body>
-    <h1 class="teamh1">Our Executive Commitee</h1>
-    <hr class="teamhr">
-    <p class="subtitle">Our executive commitee bring extensive experience, innovative thinking, <br>and a shared commitment to excellence in all aspects of JCDA's operations.</p>
-    
-    <div class="team-grid">
-        <div class="team-member">
-            <img src="PHOTO-2024-09-12-18-04-08.jpg" alt="John Doe">
-            <h2 class="teamh2" >John Doe</h2>
-            <p class="teamp">Chief Executive Officer</p>
-        </div>
-        <div class="team-member">
-            <img src="new_alake.jpg" alt="Jane Smith">
-            <h2 class="teamh2">Jane Smith</h2>
-            <p class="teamp">Chief Operations Officer</p>
-        </div>
-        <div class="team-member">
-            <img src="new_alake.jpg" alt="Mike Johnson">
-            <h2 class="teamh2"> Mike Johnson</h2>
-            <p class="teamp">Chief Financial Officer</p>
-        </div>
-        <div class="team-member">
-            <img src="new_alake.jpg" alt="Mike Johnson">
-            <h2 class="teamh2"> Mike Johnson</h2>
-            <p class="teamp">Chief Financial Officer</p>
-        </div>
-        <div class="team-member">
-            <img src="new_alake.jpg" alt="Mike Johnson">
-            <h2 class="teamh2"> Mike Johnson</h2>
-            <p class="teamp">Chief Financial Officer</p>
-        </div>
-        <div class="team-member">
-            <img src="new_alake.jpg" alt="Mike Johnson">
-            <h2 class="teamh2"> Mike Johnson</h2>
-            <p class="teamp">Chief Financial Officer</p>
-        </div>
-        <!-- Add more team members as needed -->
-    </div>
-    <footer id="Footer" class="clearfix">
-        <div class="widgets_wrapper">
-            <div class="container">
-                <div class="column one">
-                    <aside class="widget_text widget widget_custom_html">
-                        <div class="textwidget custom-html-widget">
-                            <div class="image_frame image_item no_link scale-with-grid aligncenter no_border">
-                                <div class="image_wrapper"><img class="scale-with-grid" src="/JCDA.png" width="200px" height="200px">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>JCDA - Our Team</title>
+        </head>
+        <body>
+            <h1 class="teamh1">Our Executive Committee</h1>
+            <hr class="teamhr">
+            <p class="subtitle">Our executive committee brings extensive experience, innovative thinking, <br>and a shared commitment to excellence in all aspects of JCDA's operations.</p>
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <img src="PHOTO-2024-09-12-18-04-08.jpg" alt="Hon. Ishaq Inuwa">
+                    <h2 class="teamh2">Hon. Ishaq Inuwa</h2>
+                    <p class="teamp">Chairman</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 10.17.20 PM.jpeg" alt="Dr Yusuf A. Yusuf">
+                    <h2 class="teamh2">Dr Yusuf A. Yusuf</h2>
+                    <p class="teamp">Vice Chairman</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.13 PM.jpeg" alt="Ambs. Sani Sulaiman">
+                    <h2 class="teamh2">Ambs. Sani Sulaiman</h2>
+                    <p class="teamp">Secretary General</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 10.19.49 PM.jpeg" alt="Alh. Shehu Sulen Jebu">
+                    <h2 class="teamh2">Alh. Shehu Sulen Jebu</h2>
+                    <p class="teamp">Director of Finance</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.07 PM.jpeg" alt="Hon. Abubakar Danladi">
+                    <h2 class="teamh2">Hon. Abubakar Danladi</h2>
+                    <p class="teamp">Treasurer</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.15 PM.jpeg" alt="Alh. Shehu Sa'eed">
+                    <h2 class="teamh2">Alh. Shehu Sa'eed</h2>
+                    <p class="teamp">Publicity Secretary</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.06 PM.jpeg" alt="Alh Ibrahim Muhammad">
+                    <h2 class="teamh2">Alh Ibrahim Muhammad</h2>
+                    <p class="teamp">Assistant Secretary General</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.05 PM.jpeg" alt="ALh. Adam Umar Nasir">
+                    <h2 class="teamh2">ALh. Adam Umar Nasir</h2>
+                    <p class="teamp">Admin Secretary</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.18 PM.jpeg" alt="Umar Shehu Umar">
+                    <h2 class="teamh2">Umar Shehu Umar</h2>
+                    <p class="teamp">Director of Youth Affairs</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.16 PM.jpeg" alt="Haj. Maryam Sulaiman">
+                    <h2 class="teamh2">Haj. Maryam Sulaiman</h2>
+                    <p class="teamp">Director of Women Affairs</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.08 PM.jpeg" alt="Hon Shehu Inuwa Liti">
+                    <h2 class="teamh2">Hon Shehu Inuwa Liti</h2>
+                    <p class="teamp">Director of Inter Community Relations</p>
+                </div>
+                <div class="team-member">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.13 PM (1).jpeg" alt="Hon Abdul-Nasir Saleh">
+                    <h2 class="teamh2">Hon Abdul-Nasir Saleh</h2>
+                    <p class="teamp">Director of Business, Trade and Entrepreneurship</p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.17 PM (1).jpeg" alt="Bashir Ibrahim Khalid">
+                    <h2 class="teamh2">Bashir Ibrahim Khalid</h2>
+                    <p class="teamp">Ex-Officio</p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.14 PM.jpeg" alt="Teacher Umar S. Umar">
+                    <h2 class="teamh2">Teacher Umar S. Umar</h2>
+                    <p class="teamp">Director of Youth Affairs</p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.12 PM.jpeg" alt="Alh. Haruna Hassan">
+                    <h2 class="teamh2">Alh. Haruna Hassan</h2>
+                    <p class="teamp">Ex-Officio</p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.11 PM.jpeg" alt="Engr.Yaqub I. Al-Jasawi">
+                    <h2 class="teamh2">Engr.Yaqub I. Al-Jasawi</h2>
+                    <p class="teamp"></p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 10.20.40 PM.jpeg" alt="Hon. Abubakar Ateeku Yusuf">
+                    <h2 class="teamh2">Hon. Abubakar Ateeku Yusuf</h2>
+                    <p class="teamp">Ex-Officio</p>
+                </div>
+                <div class="team-member see-more">
+                    <img src="team/WhatsApp Image 2024-09-18 at 9.02.06 PM (1).jpeg" alt="Hon A'ishatu Isma'il">
+                    <h2 class="teamh2">Hon A'ishatu Isma'il</h2>
+                    <p class="teamp">Member, Director of Women Affairs</p>
+                </div>
+            </div>
+            <footer id="Footer" class="clearfix">
+                <div class="widgets_wrapper">
+                    <div class="container">
+                        <div class="column one">
+                            <aside class="widget_text widget widget_custom_html">
+                                <div class="textwidget custom-html-widget">
+                                    <div class="image_frame image_item no_link scale-with-grid aligncenter no_border">
+                                        <div class="image_wrapper"><img class="scale-with-grid" src="/JCDA.png" width="200px" height="200px">
+                                        </div>
+                                    </div>
+                                    <hr class="no_line" style="margin:0 auto 20px">
+                                    <p style="text-align: center; padding: 0 10%; text-align: center;">
+                                        The JASAWA Action Plan is a comprehensive five-year peace-building and development initiative designed to address the complex socio-economic challenges and security issues facing JASAWA. Our vision is to create a peaceful JCDA, where prosperity and opportunities abound, and every citizen is empowered to contribute to a thriving and united Nigeria.
+                                    </p>
                                 </div>
-                            </div>
-                            <hr class="no_line" style="margin:0 auto 20px">
-                            <p style="text-align: center; padding: 0 10%; text-align: center;">
-                                The JASAWA Action Plan is a comprehensive five-year peace-building and development initiative designed to address the complex socio-economic challenges and security issues facing JASAWA. Our vision is to create a peaceful JCDA, where prosperity and opportunities abound, and every citizen is empowered to contribute to a thriving and united Nigeria.
-                            </p>
+                            </aside>
                         </div>
-                    </aside>
-                </div>
-            </div>
-        </div>
-        <div class="footer_copy">
-            <div class="container">
-                <div class="column one">
-                    <a id="back_to_top" class="button button_js" href><i class="icon-up-open-big"></i></a>
-                    <div class="copyright">
-                        &copy; 2024 JASAWA Community Development Association - All rights reserved
                     </div>
-                    <nav id="social-menu" class="menu-footer-container">
-                        <ul id="menu-footer" class="social-menu">
-                           <li><a href="#">About Us</a></li>
-                           <li><a href="#">Activities</a></li>
-                           <li><a href="#">Contact</a></li>
-                        </ul>
-                    </nav>
                 </div>
-            </div>
-    </footer>
-</div>
-<div id="Side_slide" class="right dark" data-width="250">
-    <div class="close-wrapper">
-        <a href="#" class="close"><i class="icon-cancel-fine"></i></a>
+                <div class="footer_copy">
+                    <div class="container">
+                        <div class="column one">
+                            <a id="back_to_top" class="button button_js" href><i class="icon-up-open-big"></i></a>
+                            <div class="copyright">
+                                &copy; 2024 JASAWA Community Development Association - All rights reserved
+                            </div>
+                            <nav id="social-menu" class="menu-footer-container">
+                                <ul id="menu-footer" class="social-menu">
+                                    <li><a href="#">About Us</a></li>
+                                    <li><a href="#">Activities</a></li>
+                                    <li><a href="#">Contact</a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </body>
     </div>
-    <div class="extras">
-        <a href="#" class="action_button">Donate now</a>
-        <div class="extras-wrapper"></div>
+    <div id="Side_slide" class="right dark" data-width="250">
+        <div class="close-wrapper">
+            <a href="#" class="close"><i class="icon-cancel-fine"></i></a>
+        </div>
+        <div class="extras">
+            <a href="#" class="action_button">Donate now</a>
+            <div class="extras-wrapper"></div>
+        </div>
+        <div class="menu_wrapper"></div>
     </div>
-    <div class="menu_wrapper"></div>
-</div>
-<div id="body_overlay"></div>
+    <div id="body_overlay"></div>
 
-
-<!-- JS -->
-<script src="../../js/jquery-2.1.4.min.js"></script>
-
-<script src="../../js/mfn.menu.js"></script>
-<script src="../../js/jquery.plugins.js"></script>
-<script src="../../js/jquery.jplayer.min.js"></script>
-<script src="../../js/animations/animations.js"></script>
-<script src="../../js/translate3d.js"></script>
-<script src="../../js/scripts.js"></script>
-
-
-</body>
-
-</html>
+    <!-- JS -->
+    <script src="../../js/jquery-2.1.4.min.js"></script>
+    <script src="../../js/mfn.menu.js"></script>
+    <script src="../../js/jquery.plugins.js"></script>
+    <script src="../../js/jquery.jplayer.min.js"></script>
+    <script src="../../js/animations/animations.js"></script>
+    <script src="../../js/translate3d.js"></script>
+    <script src="../../js/scripts.js"></script>
+    <script>
+        function showMore() {
+            const
