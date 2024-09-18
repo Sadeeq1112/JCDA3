@@ -1,0 +1,131 @@
+.teamh1 {
+    margin-top: 150px;
+    color: black;
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+.teamhr {
+    width: 100px;
+    height: 3px;
+    background-color: #378349;
+    margin: 0 auto 20px;
+    border: none;
+    margin-top: 15px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1em;
+    margin-bottom: 40px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    background-color: #f8fcf8; /* Light gray with a very subtle greenish tint */
+    padding: 5rem 10rem;
+    margin: 0 5rem;
+}
+
+.team-member {
+    text-align: center;
+}
+
+.team-member img {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 0.5em !important;
+}
+
+.teamh2 {
+    font-size: 1.2em;
+    color: black;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.teamp {
+    font-size: 0.8em;
+    color: black;
+    font-family: 'Arial', sans-serif;
+    margin-top: 1px;
+    position: relative;
+    top: -35px;
+}
+
+.see-more-button {
+    display: none;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background-color: #378349;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.see-more {
+    display: block;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .teamh1 {
+        font-size: 2em;
+        margin-top: 100px;
+    }
+
+    .teamhr {
+        width: 80px;
+        height: 2px;
+    }
+
+    .subtitle {
+        font-size: 0.9em;
+        margin-bottom: 30px;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 2rem;
+        margin: 0 1rem;
+    }
+
+    .team-member img {
+        width: 100%;
+        max-width: 200px;
+        height: 200px;
+    }
+
+    .teamh2 {
+        font-size: 1.2em;
+        margin-top: 2px;
+        margin-bottom: 1px; /* Add margin-bottom to create space between h2 and p */
+    }
+
+    .teamp {
+        font-size: 0.9em;
+        margin-top: 3px;
+        position: relative;
+        top: -3px;
+    }
+
+    .see-more {
+        display: none;
+    }
+
+    .see-more-button {
+        display: block;
+    }
+}
