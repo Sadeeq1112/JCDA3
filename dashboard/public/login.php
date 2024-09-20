@@ -117,11 +117,21 @@ if (isset($_SESSION['user_id'])) {
             display: flex;
             flex-direction: column;
         }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
         input {
             margin-bottom: 15px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 1em;
+        }
+        input:focus {
+            border-color: #00a86b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         button {
             background-color: #00a86b;
@@ -130,6 +140,11 @@ if (isset($_SESSION['user_id'])) {
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         .links {
             margin-top: 20px;
@@ -142,6 +157,15 @@ if (isset($_SESSION['user_id'])) {
         .error {
             color: red;
             margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .toggle-password {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .toggle-password input {
+            margin-right: 5px;
         }
         @media (max-width: 768px) {
             .container {
@@ -183,13 +207,19 @@ if (isset($_SESSION['user_id'])) {
             <h2>Sign in</h2>
             <p>Welcome back! Please log in using the details you entered during registration.</p>
             <?php if (!empty($error)): ?>
-                <div class="error"><?php echo htmlspecialchars($error); ?></div>
+                <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             <?php if (!isset($_SESSION['user_id'])): ?>
                 <form action="login.php" method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <input type="text" name="username" placeholder="Email" required>
-                    <input type="password" name="password" placeholder="Password" required>
+                    <label for="username">Username or Email</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username or email" required aria-required="true">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required aria-required="true">
+                    <div class="toggle-password">
+                        <input type="checkbox" id="toggle-password-visibility">
+                        <label for="toggle-password-visibility">Show Password</label>
+                    </div>
                     <label>
                         <input type="checkbox" name="remember"> Remember Me
                     </label>
@@ -202,5 +232,14 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
         </div>
     </div>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const togglePasswordVisibility = document.getElementById('toggle-password-visibility');
+
+        togglePasswordVisibility.addEventListener('change', function() {
+            const type = togglePasswordVisibility.checked ? 'text' : 'password';
+            passwordInput.type = type;
+        });
+    </script>
 </body>
 </html>
