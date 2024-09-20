@@ -74,7 +74,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             min-height: 100vh;
         }
         .sidebar {
-            width: 80px; /* Default to collapsed width */
+            width: 200px; /* Default to expanded width */
             background-color: #378349;
             color: white;
             padding: 20px;
@@ -87,9 +87,6 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
         }
         .sidebar.hidden {
             transform: translateX(-100%);
-        }
-        .sidebar.expanded {
-            width: 200px; /* Expanded width */
         }
         .sidebar h2 {
             margin-bottom: 30px;
@@ -122,9 +119,6 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             text-align: center; /* Align icons */
         }
         .sidebar .sidebar-text {
-            display: none;
-        }
-        .sidebar.expanded .sidebar-text {
             display: inline;
         }
         .main-content {
@@ -133,7 +127,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             background-color: white;
             border-radius: 10px;
             margin: 20px;
-            margin-left: 100px; /* Adjusted for sidebar */
+            margin-left: 220px; /* Adjusted for sidebar */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             transition: margin-left 0.3s;
         }
@@ -152,6 +146,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
         .user-profile {
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
         .user-profile img {
             width: 40px;
@@ -214,12 +209,24 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                     }
                 });
             });
+
+            // Toggle sidebar on button click
+            document.getElementById('toggleSidebar').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('hidden');
+                document.getElementById('sidebar').classList.toggle('expanded');
+                document.getElementById('mainContent').classList.toggle('expanded');
+            });
+
+            // Redirect to profile update page on profile image click
+            document.querySelector('.user-profile').addEventListener('click', function() {
+                window.location.href = 'profile.php';
+            });
         });
     </script>
 </head>
 <body>
     <div class="dashboard">
-        <div class="sidebar hidden" id="sidebar">
+        <div class="sidebar" id="sidebar">
             <h2>JCDA</h2>
             <ul>
                 <li><a href="#" class="active"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
@@ -243,7 +250,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                     <p>Name: <?php echo htmlspecialchars($profile['full_name']); ?></p>
                     <p>Occupation: <?php echo htmlspecialchars($profile['occupation']); ?></p>
                 <?php else: ?>
-                    <p>Please complete your profile.</p>
+                    <p><a href="profile.php">Please complete your profile.</a></p>
                 <?php endif; ?>
             </section>
             
@@ -262,12 +269,5 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        document.getElementById('toggleSidebar').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('hidden');
-            document.getElementById('sidebar').classList.toggle('expanded');
-            document.getElementById('mainContent').classList.toggle('expanded');
-        });
-    </script>
 </body>
 </html>
