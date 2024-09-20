@@ -2,10 +2,6 @@
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
-require '../vendor/autoload.php'; // Include PHPMailer
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 // Check if session is not already started
 if (session_status() == PHP_SESSION_NONE) {
@@ -24,91 +20,51 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 $error = '';
+$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // CSRF token validation
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         $error = "Invalid CSRF token.";
     } else {
-        $username = sanitize_input($_POST['username']);
-        $email = sanitize_input($_POST['email']);
+        $token = sanitize_input($_POST['token']);
         $password = $_POST['password'];
         $confirm_password = $_POST['confirm_password'];
 
-        // Validate input
-        if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        if (empty($token) || empty($password) || empty($confirm_password)) {
             $error = "All fields are required.";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "Invalid email format.";
         } elseif ($password !== $confirm_password) {
             $error = "Passwords do not match.";
         } else {
             try {
-                // Check if username or email already exists
-                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
-                $stmt->execute(['username' => $username, 'email' => $email]);
-                if ($stmt->rowCount() > 0) {
-                    $error = "Username or email already exists.";
-                } else {
-                    // Generate OTP
-                    $otp = rand(100000, 999999);
-                    $otp_expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+                // Check if token is valid
+                $stmt = $pdo->prepare("SELECT * FROM password_resets WHERE token = :token AND expiry > NOW()");
+                $stmt->execute(['token' => $token]);
+                $reset = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Hash the password
+                if ($reset) {
+                    // Hash the new password
                     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-                    // Insert pending registration
-                    $stmt = $pdo->prepare("INSERT INTO pending_registrations (username, email, password, otp, otp_expiry) VALUES (:username, :email, :password, :otp, :otp_expiry)");
-                    if ($stmt->execute(['username' => $username, 'email' => $email, 'password' => $hashed_password, 'otp' => $otp, 'otp_expiry' => $otp_expiry])) {
-                        // Send OTP to user's email
-                        if (send_otp_email($email, $otp)) {
-                            $_SESSION['pending_email'] = $email;
-                            header("Location: verify_otp.php");
-                            exit;
-                        } else {
-                            $error = "Failed to send verification email. Please try again.";
-                        }
+                    // Update the user's password
+                    $stmt = $pdo->prepare("UPDATE users SET password = :password WHERE email = :email");
+                    if ($stmt->execute(['password' => $hashed_password, 'email' => $reset['email']])) {
+                        // Delete the reset token
+                        $stmt = $pdo->prepare("DELETE FROM password_resets WHERE token = :token");
+                        $stmt->execute(['token' => $token]);
+
+                        $success = "Your password has been reset successfully. You can now <a href='login.php'>login</a>.";
                     } else {
-                        $error = "Registration failed. Please try again.";
+                        $error = "Failed to reset password. Please try again.";
                     }
+                } else {
+                    $error = "Invalid or expired token.";
                 }
             } catch (PDOException $e) {
                 $error = "An error occurred while processing your request. Please try again later.";
                 log_error($e->getMessage()); // Log the error message for debugging
             }
         }
-    }
-}
-
-// Function to send OTP email using PHPMailer
-function send_otp_email($email, $otp) {
-    $mail = new PHPMailer(true);
-
-    try {
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host = SMTP_HOST;
-        $mail->SMTPAuth = true;
-        $mail->Username = SMTP_USERNAME;
-        $mail->Password = SMTP_PASSWORD;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use 'ssl' if PHPMailer version < 6.1
-        $mail->Port = SMTP_PORT;
-
-        // Recipients
-        $mail->setFrom(SMTP_FROM_EMAIL, SMTP_FROM_NAME);
-        $mail->addAddress($email);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = 'Email Verification for JCDA';
-        $mail->Body    = "Your OTP for email verification is: $otp<br>This OTP will expire in 15 minutes.";
-        $mail->AltBody = "Your OTP for email verification is: $otp\nThis OTP will expire in 15 minutes.";
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        log_error("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
-        return false;
     }
 }
 ?>
@@ -118,7 +74,7 @@ function send_otp_email($email, $otp) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCDA - Register</title>
+    <title>JCDA - Reset Password</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -195,6 +151,10 @@ function send_otp_email($email, $otp) {
             color: red;
             margin-bottom: 15px;
         }
+        .success {
+            color: green;
+            margin-bottom: 15px;
+        }
         .password-strength {
             margin-bottom: 15px;
             font-size: 0.9em;
@@ -252,31 +212,30 @@ function send_otp_email($email, $otp) {
             <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
         </div>
         <div class="right-side">
-            <h2>Register for JCDA</h2>
-            <p>Welcome! Please fill in the form to create an account.</p>
+            <h2>Reset Password</h2>
             <?php if (!empty($error)): ?>
                 <div class="error"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
-            <form action="register.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <div class="password-strength" id="password-strength">
-                    <span></span>
-                </div>
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <button type="submit" id="register-button" disabled>Register</button>
-            </form>
-            <div class="links">
-                <p>Already have an account? <a href="login.php">Login here</a></p>
-            </div>
+            <?php if (!empty($success)): ?>
+                <div class="success"><?php echo htmlspecialchars($success); ?></div>
+            <?php else: ?>
+                <form action="reset_password.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? ''); ?>">
+                    <input type="password" id="password" name="password" placeholder="New Password" required>
+                    <div class="password-strength" id="password-strength">
+                        <span></span>
+                    </div>
+                    <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
+                    <button type="submit" id="reset-button" disabled>Reset Password</button>
+                </form>
+            <?php endif; ?>
         </div>
     </div>
     <script>
         const passwordInput = document.getElementById('password');
         const passwordStrength = document.getElementById('password-strength');
-        const registerButton = document.getElementById('register-button');
+        const resetButton = document.getElementById('reset-button');
 
         passwordInput.addEventListener('input', function() {
             const value = passwordInput.value;
@@ -293,15 +252,16 @@ function send_otp_email($email, $otp) {
 
             if (strength < 3) {
                 span.className = 'weak';
-                registerButton.disabled = true;
+                resetButton.disabled = true;
             } else if (strength < 5) {
                 span.className = 'medium';
-                registerButton.disabled = false;
+                resetButton.disabled = false;
             } else {
                 span.className = 'strong';
-                registerButton.disabled = false;
+                resetButton.disabled = false;
             }
         });
     </script>
 </body>
 </html>
+           

@@ -1,9 +1,72 @@
+<?php
+require_once '../includes/config.php';
+require_once '../includes/db.php';
+require_once '../includes/functions.php';
+
+// Check if session is not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Force HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// CSRF token generation
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+if (isset($_SESSION['user_id'])) {
+    $error = "You are already logged in.";
+} else {
+    $error = '';
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        // CSRF token validation
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $error = "Invalid CSRF token.";
+        } else {
+            $username = sanitize_input($_POST['username']);
+            $password = $_POST['password'];
+
+            if (empty($username) || empty($password)) {
+                $error = "Both username and password are required.";
+            } else {
+                try {
+                    // Check if username exists
+                    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
+                    $stmt->execute(['username' => $username, 'email' => $username]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($user && password_verify($password, $user['password'])) {
+                        // Regenerate session ID to prevent session fixation
+                        session_regenerate_id(true);
+
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        header("Location: dashboard.php");
+                        exit;
+                    } else {
+                        $error = "Invalid username or password.";
+                    }
+                } catch (PDOException $e) {
+                    $error = "An error occurred while processing your request. Please try again later.";
+                    log_error($e->getMessage()); // Log the error message for debugging
+                }
+            }
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCDA - Register</title>
+    <title>JCDA - Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -80,26 +143,6 @@
             color: red;
             margin-bottom: 15px;
         }
-        .password-strength {
-            margin-bottom: 15px;
-            font-size: 0.9em;
-        }
-        .password-strength span {
-            display: inline-block;
-            width: 100px;
-            height: 10px;
-            background-color: #ddd;
-            border-radius: 5px;
-        }
-        .password-strength span.weak {
-            background-color: red;
-        }
-        .password-strength span.medium {
-            background-color: orange;
-        }
-        .password-strength span.strong {
-            background-color: green;
-        }
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -137,56 +180,27 @@
             <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
         </div>
         <div class="right-side">
-            <h2>Register for JCDA</h2>
-            <p>Welcome! Please fill in the form to create an account.</p>
+            <h2>Sign in</h2>
+            <p>Welcome back! Please log in using the details you entered during registration.</p>
             <?php if (!empty($error)): ?>
                 <div class="error"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
-            <form action="register.php" method="POST">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
-                <div class="password-strength" id="password-strength">
-                    <span></span>
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                <form action="login.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    <input type="text" name="username" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <label>
+                        <input type="checkbox" name="remember"> Remember Me
+                    </label>
+                    <button type="submit">Login</button>
+                </form>
+                <div class="links">
+                    <p>Don't have an account? <a href="register.php">Register here</a></p>
+                    <p>Forgot your password? <a href="forgot_password.php">Reset Password</a></p>
                 </div>
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-                <button type="submit" id="register-button" disabled>Register</button>
-            </form>
-            <div class="links">
-                <p>Already have an account? <a href="login.php">Login here</a></p>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
-    <script>
-        const passwordInput = document.getElementById('password');
-        const passwordStrength = document.getElementById('password-strength');
-        const registerButton = document.getElementById('register-button');
-
-        passwordInput.addEventListener('input', function() {
-            const value = passwordInput.value;
-            let strength = 0;
-
-            if (value.length >= 8) strength++;
-            if (/[A-Z]/.test(value)) strength++;
-            if (/[a-z]/.test(value)) strength++;
-            if (/[0-9]/.test(value)) strength++;
-            if (/[^A-Za-z0-9]/.test(value)) strength++;
-
-            passwordStrength.innerHTML = '<span></span>';
-            const span = passwordStrength.querySelector('span');
-
-            if (strength < 3) {
-                span.className = 'weak';
-                registerButton.disabled = true;
-            } else if (strength < 5) {
-                span.className = 'medium';
-                registerButton.disabled = false;
-            } else {
-                span.className = 'strong';
-                registerButton.disabled = false;
-            }
-        });
-    </script>
 </body>
 </html>
