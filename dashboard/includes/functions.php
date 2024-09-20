@@ -54,7 +54,12 @@ function get_user_info($user_id) {
  * @param string $message
  */
 function log_error($message) {
-    error_log(date('[Y-m-d H:i:s] ') . $message . PHP_EOL, 3, 'logs/error.log');
+    $log_file = __DIR__ . '/../logs/error.log';
+    if (!file_exists($log_file)) {
+        mkdir(dirname($log_file), 0755, true);
+        touch($log_file);
+    }
+    error_log(date('[Y-m-d H:i:s] ') . $message . PHP_EOL, 3, $log_file);
 }
 
 /**
@@ -81,3 +86,4 @@ function is_payment_valid($payment_id) {
     $payment = $stmt->fetch();
     return $payment && $payment['payment_status'] === 'completed';
 }
+?>
