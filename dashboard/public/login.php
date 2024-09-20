@@ -19,43 +19,86 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Check if user is already logged in via session or cookie
 if (isset($_SESSION['user_id'])) {
     $error = "You are already logged in.";
-} else {
-    $error = '';
+} elseif (isset($_COOKIE['remember_me'])) {
+    // Validate the remember me cookie
+    list($selector, $authenticator) = explode(':', $_COOKIE['remember_me']);
+    $stmt = $pdo->prepare("SELECT * FROM auth_tokens WHERE selector = :selector");
+    $stmt->execute(['selector' => $selector]);
+    $token = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        // CSRF token validation
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            $error = "Invalid CSRF token.";
+    if ($token && hash_equals($token['token'], hash('sha256', $authenticator)) && $token['expires'] >= date('Y-m-d H:i:s')) {
+        // Log the user in
+        $_SESSION['user_id'] = $token['user_id'];
+        header("Location: dashboard.php");
+        exit;
+    }
+}
+
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // CSRF token validation
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = "Invalid CSRF token.";
+    } else {
+        $username = sanitize_input($_POST['username']);
+        $password = $_POST['password'];
+        $remember = isset($_POST['remember']);
+
+        if (empty($username) || empty($password)) {
+            $error = "Both username and password are required.";
         } else {
-            $username = sanitize_input($_POST['username']);
-            $password = $_POST['password'];
+            try {
+                // Check if username exists
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
+                $stmt->execute(['username' => $username, 'email' => $username]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (empty($username) || empty($password)) {
-                $error = "Both username and password are required.";
-            } else {
-                try {
-                    // Check if username exists
-                    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
-                    $stmt->execute(['username' => $username, 'email' => $username]);
-                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                if ($user && password_verify($password, $user['password'])) {
+                    // Regenerate session ID to prevent session fixation
+                    session_regenerate_id(true);
 
-                    if ($user && password_verify($password, $user['password'])) {
-                        // Regenerate session ID to prevent session fixation
-                        session_regenerate_id(true);
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['username'] = $user['username'];
 
-                        $_SESSION['user_id'] = $user['id'];
-                        $_SESSION['username'] = $user['username'];
-                        header("Location: dashboard.php");
-                        exit;
-                    } else {
-                        $error = "Invalid username or password.";
+                    if ($remember) {
+                        // Generate a new remember me token
+                        $selector = bin2hex(random_bytes(8));
+                        $authenticator = bin2hex(random_bytes(32));
+                        $expires = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+                        // Store the token in the database
+                        $stmt = $pdo->prepare("INSERT INTO auth_tokens (selector, token, user_id, expires) VALUES (:selector, :token, :user_id, :expires)");
+                        $stmt->execute([
+                            'selector' => $selector,
+                            'token' => hash('sha256', $authenticator),
+                            'user_id' => $user['id'],
+                            'expires' => $expires
+                        ]);
+
+                        // Set the cookie
+                        setcookie(
+                            'remember_me',
+                            $selector . ':' . $authenticator,
+                            time() + 86400 * 30, // 30 days
+                            '/',
+                            $_SERVER['HTTP_HOST'],
+                            isset($_SERVER['HTTPS']),
+                            true // HTTP only
+                        );
                     }
-                } catch (PDOException $e) {
-                    $error = "An error occurred while processing your request. Please try again later.";
-                    log_error($e->getMessage()); // Log the error message for debugging
+
+                    header("Location: dashboard.php");
+                    exit;
+                } else {
+                    $error = "Invalid username or password.";
                 }
+            } catch (PDOException $e) {
+                $error = "An error occurred while processing your request. Please try again later.";
+                log_error($e->getMessage()); // Log the error message for debugging
             }
         }
     }

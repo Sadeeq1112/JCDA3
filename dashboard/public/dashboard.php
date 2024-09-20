@@ -3,11 +3,38 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
+// Check if session is not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Force HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// Regenerate session ID to prevent session fixation
+if (!isset($_SESSION['regenerated'])) {
+    session_regenerate_id(true);
+    $_SESSION['regenerated'] = true;
+}
+
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
 }
+
+// Implement session timeout
+$timeout_duration = 1800; // 30 minutes
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > $timeout_duration) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php");
+    exit;
+}
+$_SESSION['last_activity'] = time();
 
 // Temporarily disable database checks for UI editing
 $user_id = $_SESSION['user_id'];
@@ -62,7 +89,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             transform: translateX(-100%);
         }
         .sidebar.expanded {
-            width: 80px; /* Show only icons */
+            width: 200px; /* Expanded width */
         }
         .sidebar h2 {
             margin-bottom: 30px;
@@ -97,6 +124,9 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
         .sidebar .sidebar-text {
             display: none;
         }
+        .sidebar.expanded .sidebar-text {
+            display: inline;
+        }
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -108,7 +138,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
             transition: margin-left 0.3s;
         }
         .main-content.expanded {
-            margin-left: 100px; /* Adjusted for expanded sidebar */
+            margin-left: 220px; /* Adjusted for expanded sidebar */
         }
         .header {
             display: flex;
@@ -154,13 +184,38 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                 margin-left: 20px; /* Adjusted for hidden sidebar */
             }
             .main-content.expanded {
-                margin-left: 100px; /* Adjusted for expanded sidebar */
+                margin-left: 220px; /* Adjusted for expanded sidebar */
             }
             .header h1 {
                 font-size: 1.5rem; /* Reduced font size for mobile */
             }
         }
     </style>
+    <script>
+        // Function to show tooltips
+        function showTooltip(element, message) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.innerText = message;
+            document.body.appendChild(tooltip);
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX + element.offsetWidth / 2 - tooltip.offsetWidth / 2}px`;
+            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
+            element.addEventListener('mouseleave', () => {
+                tooltip.remove();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.addEventListener('mouseenter', () => {
+                    if (!document.querySelector('.sidebar').classList.contains('expanded')) {
+                        showTooltip(link, link.querySelector('.sidebar-text').innerText);
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="dashboard">
