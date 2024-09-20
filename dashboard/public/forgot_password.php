@@ -77,6 +77,12 @@ function send_reset_email($email, $token) {
     $mail = new PHPMailer(true);
 
     try {
+        // Enable verbose debug output
+        $mail->SMTPDebug = 2; // Set to 0 in production
+        $mail->Debugoutput = function($str, $level) {
+            log_error("PHPMailer debug level $level; message: $str");
+        };
+
         // Server settings
         $mail->isSMTP();
         $mail->Host = SMTP_HOST;
