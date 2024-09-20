@@ -57,6 +57,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Dashboard</title>
+    <link rel="icon" href="public/JCDA White.png" type="image/png">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
@@ -88,8 +89,14 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
         .sidebar.hidden {
             transform: translateX(-100%);
         }
-        .sidebar h2 {
+        .sidebar .logo {
+            display: flex;
+            justify-content: center;
             margin-bottom: 30px;
+        }
+        .sidebar .logo img {
+            max-width: 100px;
+            height: auto;
         }
         .sidebar ul {
             list-style-type: none;
@@ -227,7 +234,9 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
 <body>
     <div class="dashboard">
         <div class="sidebar" id="sidebar">
-            <h2>JCDA</h2>
+            <div class="logo">
+                <img src="public/JCDA White.png" alt="JCDA Logo">
+            </div>
             <ul>
                 <li><a href="#" class="active"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
                 <li><a href="profile.php"><i class="fas fa-user sidebar-icon"></i> <span class="sidebar-text">Edit Profile</span></a></li>
