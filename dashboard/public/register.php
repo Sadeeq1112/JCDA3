@@ -7,54 +7,75 @@ require '../vendor/autoload.php'; // Include PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+// Check if session is not already started
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Force HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// CSRF token generation
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = sanitize_input($_POST['username']);
-    $email = sanitize_input($_POST['email']);
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-
-    // Validate input
-    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        $error = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email format.";
-    } elseif ($password !== $confirm_password) {
-        $error = "Passwords do not match.";
+    // CSRF token validation
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = "Invalid CSRF token.";
     } else {
-        try {
-            // Check if username or email already exists
-            $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-            $stmt->execute([$username, $email]);
-            if ($stmt->rowCount() > 0) {
-                $error = "Username or email already exists.";
-            } else {
-                // Generate OTP
-                $otp = rand(100000, 999999);
-                $otp_expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+        $username = sanitize_input($_POST['username']);
+        $email = sanitize_input($_POST['email']);
+        $password = $_POST['password'];
+        $confirm_password = $_POST['confirm_password'];
 
-                // Hash the password
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-                // Insert pending registration
-                $stmt = $pdo->prepare("INSERT INTO pending_registrations (username, email, password, otp, otp_expiry) VALUES (?, ?, ?, ?, ?)");
-                if ($stmt->execute([$username, $email, $hashed_password, $otp, $otp_expiry])) {
-                    // Send OTP to user's email
-                    if (send_otp_email($email, $otp)) {
-                        $_SESSION['pending_email'] = $email;
-                        header("Location: verify_otp.php");
-                        exit;
-                    } else {
-                        $error = "Failed to send verification email. Please try again.";
-                    }
+        // Validate input
+        if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+            $error = "All fields are required.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = "Invalid email format.";
+        } elseif ($password !== $confirm_password) {
+            $error = "Passwords do not match.";
+        } else {
+            try {
+                // Check if username or email already exists
+                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
+                $stmt->execute(['username' => $username, 'email' => $email]);
+                if ($stmt->rowCount() > 0) {
+                    $error = "Username or email already exists.";
                 } else {
-                    $error = "Registration failed. Please try again.";
+                    // Generate OTP
+                    $otp = rand(100000, 999999);
+                    $otp_expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+                    // Hash the password
+                    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+                    // Insert pending registration
+                    $stmt = $pdo->prepare("INSERT INTO pending_registrations (username, email, password, otp, otp_expiry) VALUES (:username, :email, :password, :otp, :otp_expiry)");
+                    if ($stmt->execute(['username' => $username, 'email' => $email, 'password' => $hashed_password, 'otp' => $otp, 'otp_expiry' => $otp_expiry])) {
+                        // Send OTP to user's email
+                        if (send_otp_email($email, $otp)) {
+                            $_SESSION['pending_email'] = $email;
+                            header("Location: verify_otp.php");
+                            exit;
+                        } else {
+                            $error = "Failed to send verification email. Please try again.";
+                        }
+                    } else {
+                        $error = "Registration failed. Please try again.";
+                    }
                 }
+            } catch (PDOException $e) {
+                $error = "An error occurred while processing your request. Please try again later.";
+                log_error($e->getMessage()); // Log the error message for debugging
             }
-        } catch (PDOException $e) {
-            $error = "An error occurred while processing your request. Please try again later.";
-            log_error($e->getMessage()); // Log the error message for debugging
         }
     }
 }
@@ -110,6 +131,7 @@ function send_otp_email($email, $otp) {
                     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
                 <form action="register.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" class="form-control" required>

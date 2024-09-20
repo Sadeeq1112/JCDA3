@@ -8,35 +8,54 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Force HTTPS
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+    header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
+// CSRF token generation
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 if (isset($_SESSION['user_id'])) {
     $error = "You are already logged in.";
 } else {
     $error = '';
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $username = sanitize_input($_POST['username']);
-        $password = $_POST['password'];
-
-        if (empty($username) || empty($password)) {
-            $error = "Both username and password are required.";
+        // CSRF token validation
+        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+            $error = "Invalid CSRF token.";
         } else {
-            try {
-                // Check if username exists
-                $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-                $stmt->execute([$username, $username]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $username = sanitize_input($_POST['username']);
+            $password = $_POST['password'];
 
-                if ($user && password_verify($password, $user['password'])) {
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['username'] = $user['username'];
-                    header("Location: dashboard.php");
-                    exit;
-                } else {
-                    $error = "Invalid username or password.";
+            if (empty($username) || empty($password)) {
+                $error = "Both username and password are required.";
+            } else {
+                try {
+                    // Check if username exists
+                    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username OR email = :email");
+                    $stmt->execute(['username' => $username, 'email' => $username]);
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($user && password_verify($password, $user['password'])) {
+                        // Regenerate session ID to prevent session fixation
+                        session_regenerate_id(true);
+
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['username'] = $user['username'];
+                        header("Location: dashboard.php");
+                        exit;
+                    } else {
+                        $error = "Invalid username or password.";
+                    }
+                } catch (PDOException $e) {
+                    $error = "An error occurred while processing your request. Please try again later.";
+                    log_error($e->getMessage()); // Log the error message for debugging
                 }
-            } catch (PDOException $e) {
-                $error = "An error occurred while processing your request. Please try again later.";
-                log_error($e->getMessage()); // Log the error message for debugging
             }
         }
     }
@@ -168,6 +187,7 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
             <?php if (!isset($_SESSION['user_id'])): ?>
                 <form action="login.php" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="text" name="username" placeholder="Email" required>
                     <input type="password" name="password" placeholder="Password" required>
                     <label>
