@@ -125,11 +125,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: flex;
             flex-direction: column;
         }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
         input {
             margin-bottom: 15px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 1em;
+        }
+        input:focus {
+            border-color: #00a86b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         button {
             background-color: #00a86b;
@@ -138,6 +148,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         .links {
             margin-top: 20px;
@@ -150,10 +165,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .error {
             color: red;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .success {
             color: green;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .password-strength {
             margin-bottom: 15px;
@@ -174,6 +191,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .password-strength span.strong {
             background-color: green;
+        }
+        .password-hints {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .toggle-password {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .toggle-password input {
+            margin-right: 5px;
         }
         @media (max-width: 768px) {
             .container {
@@ -222,11 +252,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <form action="reset_password.php" method="POST">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="token" value="<?php echo htmlspecialchars($_GET['token'] ?? ''); ?>">
-                    <input type="password" id="password" name="password" placeholder="New Password" required>
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter new password" required>
+                    <div class="password-hints">
+                        Password must be at least 8 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters.
+                    </div>
                     <div class="password-strength" id="password-strength">
                         <span></span>
                     </div>
-                    <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
+                    <label for="confirm_password">Confirm New Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required>
+                    <div class="toggle-password">
+                        <input type="checkbox" id="toggle-password-visibility">
+                        <label for="toggle-password-visibility">Show Password</label>
+                    </div>
                     <button type="submit" id="reset-button" disabled>Reset Password</button>
                 </form>
             <?php endif; ?>
@@ -234,8 +273,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
     <script>
         const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
         const passwordStrength = document.getElementById('password-strength');
         const resetButton = document.getElementById('reset-button');
+        const togglePasswordVisibility = document.getElementById('toggle-password-visibility');
 
         passwordInput.addEventListener('input', function() {
             const value = passwordInput.value;
@@ -260,6 +301,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 span.className = 'strong';
                 resetButton.disabled = false;
             }
+        });
+
+        togglePasswordVisibility.addEventListener('change', function() {
+            const type = togglePasswordVisibility.checked ? 'text' : 'password';
+            passwordInput.type = type;
+            confirmPasswordInput.type = type;
         });
     </script>
 </body>

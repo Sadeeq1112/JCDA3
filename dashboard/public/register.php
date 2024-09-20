@@ -169,11 +169,21 @@ function send_otp_email($email, $otp) {
             display: flex;
             flex-direction: column;
         }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
         input {
             margin-bottom: 15px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 1em;
+        }
+        input:focus {
+            border-color: #00a86b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         button {
             background-color: #00a86b;
@@ -182,6 +192,11 @@ function send_otp_email($email, $otp) {
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         .links {
             margin-top: 20px;
@@ -194,6 +209,7 @@ function send_otp_email($email, $otp) {
         .error {
             color: red;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .password-strength {
             margin-bottom: 15px;
@@ -214,6 +230,19 @@ function send_otp_email($email, $otp) {
         }
         .password-strength span.strong {
             background-color: green;
+        }
+        .password-hints {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .toggle-password {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .toggle-password input {
+            margin-right: 5px;
         }
         @media (max-width: 768px) {
             .container {
@@ -255,17 +284,28 @@ function send_otp_email($email, $otp) {
             <h2>Register for JCDA</h2>
             <p>Welcome! Please fill in the form to create an account.</p>
             <?php if (!empty($error)): ?>
-                <div class="error"><?php echo htmlspecialchars($error); ?></div>
+                <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             <form action="register.php" method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <input type="text" name="username" placeholder="Username" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required aria-required="true">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required aria-required="true">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required aria-required="true">
+                <div class="password-hints">
+                    Password must be at least 8 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters.
+                </div>
                 <div class="password-strength" id="password-strength">
                     <span></span>
                 </div>
-                <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required aria-required="true">
+                <div class="toggle-password">
+                    <input type="checkbox" id="toggle-password-visibility">
+                    <label for="toggle-password-visibility">Show Password</label>
+                </div>
                 <button type="submit" id="register-button" disabled>Register</button>
             </form>
             <div class="links">
@@ -275,8 +315,10 @@ function send_otp_email($email, $otp) {
     </div>
     <script>
         const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
         const passwordStrength = document.getElementById('password-strength');
         const registerButton = document.getElementById('register-button');
+        const togglePasswordVisibility = document.getElementById('toggle-password-visibility');
 
         passwordInput.addEventListener('input', function() {
             const value = passwordInput.value;
@@ -301,6 +343,12 @@ function send_otp_email($email, $otp) {
                 span.className = 'strong';
                 registerButton.disabled = false;
             }
+        });
+
+        togglePasswordVisibility.addEventListener('change', function() {
+            const type = togglePasswordVisibility.checked ? 'text' : 'password';
+            passwordInput.type = type;
+            confirmPasswordInput.type = type;
         });
     </script>
 </body>

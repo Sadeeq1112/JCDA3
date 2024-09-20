@@ -78,7 +78,7 @@ function send_reset_email($email, $token) {
 
     try {
         // Enable verbose debug output
-        $mail->SMTPDebug = 2; // Set to 0 in production
+        $mail->SMTPDebug = 0; // Set to 0 in production
         $mail->Debugoutput = function($str, $level) {
             log_error("PHPMailer debug level $level; message: $str");
         };
@@ -99,8 +99,8 @@ function send_reset_email($email, $token) {
         // Content
         $mail->isHTML(true);
         $mail->Subject = 'Password Reset for JCDA';
-        $mail->Body    = "Click the link below to reset your password:<br><a href='https://jcda.com.ng/reset_password.php?token=$token'>Reset Password</a><br>This link will expire in 1 hour.";
-        $mail->AltBody = "Click the link below to reset your password:\nhttps://jcda.com.ng/reset_password.php?token=$token\nThis link will expire in 1 hour.";
+        $mail->Body    = "Hello,<br><br>We received a request to reset your password. Click the link below to reset your password:<br><a href='https://jcda.com.ng/dashboard/publicreset_password.php?token=$token'>Reset Password</a><br><br>This link will expire in 1 hour.<br><br>If you did not request a password reset, please ignore this email.<br><br>Thank you,<br>JCDA Team";
+        $mail->AltBody = "Hello,\n\nWe received a request to reset your password. Click the link below to reset your password:\nhttps://jcda.com.ng/dashboard/public/reset_password.php?token=$token\n\nThis link will expire in 1 hour.\n\nIf you did not request a password reset, please ignore this email.\n\nThank you,\nJCDA Team";
 
         $mail->send();
         return true;
@@ -167,11 +167,21 @@ function send_reset_email($email, $token) {
             display: flex;
             flex-direction: column;
         }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
         input {
             margin-bottom: 15px;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            font-size: 1em;
+        }
+        input:focus {
+            border-color: #00a86b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         button {
             background-color: #00a86b;
@@ -180,6 +190,11 @@ function send_reset_email($email, $token) {
             padding: 10px;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1em;
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
         }
         .links {
             margin-top: 20px;
@@ -192,10 +207,12 @@ function send_reset_email($email, $token) {
         .error {
             color: red;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .success {
             color: green;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         @media (max-width: 768px) {
             .container {
@@ -235,17 +252,18 @@ function send_reset_email($email, $token) {
         </div>
         <div class="right-side">
             <h2>Forgot Password</h2>
-            <p>Enter your email address to receive a password reset link.</p>
+            <p>Enter your email address to receive a password reset link. Make sure to check your spam or junk folder if you don't see the email in your inbox.</p>
             <?php if (!empty($error)): ?>
-                <div class="error"><?php echo htmlspecialchars($error); ?></div>
+                <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
             <?php if (!empty($success)): ?>
-                <div class="success"><?php echo htmlspecialchars($success); ?></div>
+                <div class="success" role="alert"><?php echo htmlspecialchars($success); ?></div>
             <?php endif; ?>
             <form action="forgot_password.php" method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                <input type="email" name="email" placeholder="Email" required>
-                <button type="submit">Send Reset Link</button>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required aria-required="true">
+                <button type="submit">Send Password Reset Link</button>
             </form>
             <div class="links">
                 <p>Remembered your password? <a href="login.php">Login here</a></p>
