@@ -39,19 +39,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = trim($_POST['phone']);
     $date_of_birth = $_POST['date_of_birth'];
     $occupation = trim($_POST['occupation']);
+    $profile_picture = $_FILES['profile_picture'];
 
     if (empty($full_name)) {
         $error = "Full name is required.";
     } else {
-        if ($profile) {
-            // Update existing profile
-            $stmt = $pdo->prepare("UPDATE profiles SET full_name = ?, address = ?, phone = ?, date_of_birth = ?, occupation = ?, updated = 1 WHERE user_id = ?");
+        // Handle profile picture upload
+        if ($profile_picture['error'] == UPLOAD_ERR_OK) {
+            $upload_dir = '../uploads/';
+            $upload_file = $upload_dir . basename($profile_picture['name']);
+            if (move_uploaded_file($profile_picture['tmp_name'], $upload_file)) {
+                $profile_picture_path = $upload_file;
+            } else {
+                $error = "Failed to upload profile picture.";
+            }
         } else {
-            // Insert new profile
-            $stmt = $pdo->prepare("INSERT INTO profiles (full_name, address, phone, date_of_birth, occupation, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, 1)");
+            $profile_picture_path = $profile['profile_picture'] ?? null;
         }
 
-        if ($stmt->execute([$full_name, $address, $phone, $date_of_birth, $occupation, $user_id])) {
+        if ($profile) {
+            // Update existing profile
+            $stmt = $pdo->prepare("UPDATE profiles SET full_name = ?, address = ?, phone = ?, date_of_birth = ?, occupation = ?, profile_picture = ?, updated = 1 WHERE user_id = ?");
+            $params = [$full_name, $address, $phone, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+        } else {
+            // Insert new profile
+            $stmt = $pdo->prepare("INSERT INTO profiles (full_name, address, phone, date_of_birth, occupation, profile_picture, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+            $params = [$full_name, $address, $phone, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+        }
+
+        if ($stmt->execute($params)) {
             $success = "Profile updated successfully.";
             // Refresh profile data
             $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
@@ -73,6 +89,7 @@ $readonly = $profile && $profile['updated'] == 1;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Profile</title>
+    <link rel="icon" href="public/JCDA White.png" type="image/png">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
@@ -90,7 +107,7 @@ $readonly = $profile && $profile['updated'] == 1;
             min-height: 100vh;
         }
         .sidebar {
-            width: 80px; /* Default to collapsed width */
+            width: 200px; /* Default to expanded width */
             background-color: #378349;
             color: white;
             padding: 20px;
@@ -104,11 +121,14 @@ $readonly = $profile && $profile['updated'] == 1;
         .sidebar.hidden {
             transform: translateX(-100%);
         }
-        .sidebar.expanded {
-            width: 80px; /* Show only icons */
-        }
-        .sidebar h2 {
+        .sidebar .logo {
+            display: flex;
+            justify-content: center;
             margin-bottom: 30px;
+        }
+        .sidebar .logo img {
+            max-width: 100px;
+            height: auto;
         }
         .sidebar ul {
             list-style-type: none;
@@ -138,7 +158,7 @@ $readonly = $profile && $profile['updated'] == 1;
             text-align: center; /* Align icons */
         }
         .sidebar .sidebar-text {
-            display: none;
+            display: inline;
         }
         .main-content {
             flex-grow: 1;
@@ -146,12 +166,12 @@ $readonly = $profile && $profile['updated'] == 1;
             background-color: white;
             border-radius: 10px;
             margin: 20px;
-            margin-left: 100px; /* Adjusted for sidebar */
+            margin-left: 220px; /* Adjusted for sidebar */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             transition: margin-left 0.3s;
         }
         .main-content.expanded {
-            margin-left: 100px; /* Adjusted for expanded sidebar */
+            margin-left: 220px; /* Adjusted for expanded sidebar */
         }
         .header {
             display: flex;
@@ -165,6 +185,7 @@ $readonly = $profile && $profile['updated'] == 1;
         .user-profile {
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
         .user-profile img {
             width: 40px;
@@ -200,19 +221,56 @@ $readonly = $profile && $profile['updated'] == 1;
                 margin-left: 20px; /* Adjusted for hidden sidebar */
             }
             .main-content.expanded {
-                margin-left: 100px; /* Adjusted for expanded sidebar */
+                margin-left: 220px; /* Adjusted for expanded sidebar */
             }
             .header h1 {
                 font-size: 1.2rem; /* Reduced font size for mobile */
             }
         }
     </style>
+    <script>
+        // Function to show tooltips
+        function showTooltip(element, message) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.innerText = message;
+            document.body.appendChild(tooltip);
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = `${rect.left + window.scrollX + element.offsetWidth / 2 - tooltip.offsetWidth / 2}px`;
+            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 5}px`;
+            element.addEventListener('mouseleave', () => {
+                tooltip.remove();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar a').forEach(link => {
+                link.addEventListener('mouseenter', () => {
+                    if (!document.querySelector('.sidebar').classList.contains('expanded')) {
+                        showTooltip(link, link.querySelector('.sidebar-text').innerText);
+                    }
+                });
+            });
+
+            // Toggle sidebar on button click
+            document.getElementById('toggleSidebar').addEventListener('click', function() {
+                document.getElementById('sidebar').classList.toggle('hidden');
+                document.getElementById('sidebar').classList.toggle('expanded');
+                document.getElementById('mainContent').classList.toggle('expanded');
+            });
+
+            // Redirect to profile update page on profile image click
+            document.querySelector('.user-profile').addEventListener('click', function() {
+                window.location.href = 'profile.php';
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="dashboard">
-        <div class="sidebar hidden" id="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="/JCDA.png" alt="JCDA Logo" style="width: 100%; height: auto;">
+                <img src="public/JCDA White.png" alt="JCDA Logo">
             </div>
             <ul>
                 <li><a href="dashboard.php"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
@@ -227,7 +285,7 @@ $readonly = $profile && $profile['updated'] == 1;
                 <button class="btn btn-primary" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
                 <div class="user-profile">
-                    <img src="../assets/images/useravatar.jpg" alt="User profile">
+                    <img src="<?php echo $profile ? htmlspecialchars($profile['profile_picture']) : '../assets/images/useravatar.jpg'; ?>" alt="User profile">
                 </div>
             </div>
             <section class="profile-summary">
@@ -238,7 +296,7 @@ $readonly = $profile && $profile['updated'] == 1;
                 <?php if (isset($success)): ?>
                     <div class="alert alert-success"><?php echo $success; ?></div>
                 <?php endif; ?>
-                <form action="profile.php" method="POST">
+                <form action="profile.php" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="full_name">Full Name:</label>
                         <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required>
@@ -253,11 +311,15 @@ $readonly = $profile && $profile['updated'] == 1;
                     </div>
                     <div class="form-group">
                         <label for="date_of_birth">Date of Birth:</label>
-                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control <?php echo $readonly ? 'readonly' : ''; ?>" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" <?php echo $readonly ? 'readonly' : ''; ?>>
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-control <?php echo $readonly ? 'readonly' : ''; ?>" value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" <?php echo $readonly ? 'readonly' : ''; ?> onfocus="this.blur()">
                     </div>
                     <div class="form-group">
                         <label for="occupation">Occupation:</label>
                         <input type="text" id="occupation" name="occupation" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile_picture">Profile Picture:</label>
+                        <input type="file" id="profile_picture" name="profile_picture" class="form-control-file">
                     </div>
                     <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
@@ -268,12 +330,5 @@ $readonly = $profile && $profile['updated'] == 1;
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        document.getElementById('toggleSidebar').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('hidden');
-            document.getElementById('sidebar').classList.toggle('expanded');
-            document.getElementById('mainContent').classList.toggle('expanded');
-        });
-    </script>
 </body>
 </html>
