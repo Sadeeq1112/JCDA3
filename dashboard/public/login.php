@@ -198,6 +198,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             transform: translateY(-50%);
             cursor: pointer;
         }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .remember-me input {
+            margin-right: 10px;
+        }
         button {
             background-color: #00a86b;
             color: white;
@@ -276,9 +284,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <span class="toggle-password" onclick="togglePasswordVisibility('password')"><i class="fa fa-eye-slash"></i></span>
                 </div>
                 
-                <label>
-                    <input type="checkbox" name="remember"> Remember Me
-                </label>
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember Me</label>
+                </div>
                 
                 <button type="submit">Login</button>
             </form>
