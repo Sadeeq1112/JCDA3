@@ -110,113 +110,140 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            line-height: 1.6;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 20px;
         }
         .container {
-            display: flex;
             background-color: white;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            width: 90%;
+            width: 100%;
             max-width: 1000px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
             flex-direction: column;
         }
-        .left-side {
-            background-color: #ffe6e6;
+        .left-side, .right-side {
             padding: 40px;
+        }
+        .left-side {
+            background-color: #e6ffe6;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            width: 100%;
-        }
-        .right-side {
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-        }
-        .logo {
-            margin-bottom: 20px;
+            text-align: center;
         }
         .logo img {
-            max-width: 100px;
+            max-width: 120px;
+            margin-bottom: 20px;
+        }
+        .left-side img {
+            max-width: 80%;
+            height: auto;
         }
         h2 {
-            color: #333;
+            color: #2c3e50;
             margin-bottom: 20px;
+            font-size: 2rem;
         }
         form {
             display: flex;
             flex-direction: column;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
         label {
             margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: 600;
+            color: #34495e;
+        }
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
         }
         input {
-            margin-bottom: 15px;
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
         }
         input:focus {
             border-color: #00a86b;
             outline: none;
-            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
+            box-shadow: 0 0 0 2px rgba(0, 168, 107, 0.2);
+        }
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            cursor: pointer;
         }
         button {
             background-color: #00a86b;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
         }
-        button:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
+        button:hover {
+            background-color: #008c59;
+        }
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
         }
         .links {
             margin-top: 20px;
-            font-size: 0.9em;
+            font-size: 0.9rem;
+            text-align: center;
         }
         .links a {
             color: #00a86b;
             text-decoration: none;
+            font-weight: 600;
         }
         .error {
-            color: red;
+            color: #e74c3c;
             margin-bottom: 15px;
-            font-weight: bold;
+            font-weight: 600;
+            text-align: center;
+            background-color: #fde8e8;
+            padding: 10px;
+            border-radius: 6px;
         }
-        .toggle-password {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .toggle-password input {
-            margin-right: 5px;
-        }
-        @media (min-width: 769px) {
+        @media (min-width: 768px) {
             .container {
                 flex-direction: row;
             }
             .left-side, .right-side {
                 width: 50%;
+            }
+            .left-side {
+                padding: 60px 40px;
             }
         }
     </style>
@@ -227,45 +254,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="logo">
                 <img src="/JCDA.png" alt="JCDA Logo">
             </div>
-            <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
+            <h2>Welcome Back!</h2>
+            <p>Log in to access your account and continue where you left off.</p>
         </div>
         <div class="right-side">
-            <h2>Sign in</h2>
-            <p>Welcome back! Please log in using the details you entered during registration.</p>
-            <?php if (!empty($error)): ?>
-                <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
-            <?php endif; ?>
-            <?php if (!isset($_SESSION['user_id'])): ?>
-                <form action="login.php" method="POST">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <label for="username">Username or Email</label>
+            <form action="login.php" method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                
+                <?php if (!empty($error)): ?>
+                    <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
+                <?php endif; ?>
+
+                <label for="username">Username or Email</label>
+                <div class="input-container">
                     <input type="text" id="username" name="username" placeholder="Enter your username or email" required aria-required="true">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required aria-required="true">
-                    <div class="toggle-password">
-                        <input type="checkbox" id="toggle-password-visibility">
-                        <label for="toggle-password-visibility">Show Password</label>
-                    </div>
-                    <label>
-                        <input type="checkbox" name="remember"> Remember Me
-                    </label>
-                    <button type="submit">Login</button>
-                </form>
-                <div class="links">
-                    <p>Don't have an account? <a href="register.php">Register here</a></p>
-                    <p>Forgot your password? <a href="forgot_password.php">Reset Password</a></p>
                 </div>
-            <?php endif; ?>
+                
+                <label for="password">Password</label>
+                <div class="input-container">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required aria-required="true">
+                    <span class="toggle-password" onclick="togglePasswordVisibility('password')"><i class="fa fa-eye-slash"></i></span>
+                </div>
+                
+                <label>
+                    <input type="checkbox" name="remember"> Remember Me
+                </label>
+                
+                <button type="submit">Login</button>
+            </form>
+            <div class="links">
+                <p>Don't have an account? <a href="register.php">Register here</a></p>
+                <p>Forgot your password? <a href="forgot_password.php">Reset Password</a></p>
+            </div>
         </div>
     </div>
     <script>
-        const passwordInput = document.getElementById('password');
-        const togglePasswordVisibility = document.getElementById('toggle-password-visibility');
-
-        togglePasswordVisibility.addEventListener('change', function() {
-            const type = togglePasswordVisibility.checked ? 'text' : 'password';
-            passwordInput.type = type;
-        });
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling.querySelector('i');
+            const type = input.type === 'password' ? 'text' : 'password';
+            input.type = type;
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
     </script>
 </body>
 </html>
