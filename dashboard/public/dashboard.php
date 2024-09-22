@@ -49,6 +49,9 @@ $profile = $stmt->fetch(PDO::FETCH_ASSOC);
 $stmt = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? ORDER BY payment_date DESC LIMIT 1");
 $stmt->execute([$user_id]);
 $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Set default profile picture if none is set
+$profile_picture = $profile['profile_picture'] ?? '../assets/images/useravatar.jpg';
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +60,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Dashboard</title>
-    <link rel="icon" href="public/JCDA White.png" type="../JCDA WHite.png">
+    <link rel="icon" href="jcdawhite.png" type="../JCDA WHite.png">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
@@ -235,7 +238,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
     <div class="dashboard">
         <div class="sidebar" id="sidebar">
             <div class="logo">
-                <img src="../JCDA White.png" alt="JCDA Logo">
+                <img src="jcdawhite.png" alt="JCDA Logo">
             </div>
             <ul>
                 <li><a href="#" class="active"><i class="fas fa-home sidebar-icon"></i> <span class="sidebar-text">Home</span></a></li>
@@ -250,7 +253,7 @@ $latest_payment = $stmt->fetch(PDO::FETCH_ASSOC);
                 <button class="btn btn-primary" id="toggleSidebar"><i class="fas fa-bars"></i></button>
                 <h1>Welcome, <?php echo htmlspecialchars($username); ?>!</h1>
                 <div class="user-profile">
-                    <img src="../assets/images/useravatar.jpg" alt="User profile">
+                    <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="User profile">
                 </div>
             </div>
             <section class="profile-summary">

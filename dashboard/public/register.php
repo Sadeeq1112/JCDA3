@@ -135,25 +135,26 @@ function send_otp_email($email, $otp) {
             background-color: white;
             border-radius: 10px;
             overflow: hidden;
-            width: 80%;
+            width: 90%;
             max-width: 1000px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex-direction: column;
         }
         .left-side {
             background-color: #ffe6e6;
             padding: 40px;
-            width: 50%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            width: 100%;
         }
         .right-side {
             padding: 40px;
-            width: 50%;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            width: 100%;
         }
         .logo {
             margin-bottom: 20px;
@@ -244,30 +245,12 @@ function send_otp_email($email, $otp) {
         .toggle-password input {
             margin-right: 5px;
         }
-        @media (max-width: 768px) {
+        @media (min-width: 769px) {
             .container {
-                flex-direction: column;
-                width: 90%;
+                flex-direction: row;
             }
             .left-side, .right-side {
-                width: 100%;
-                padding: 20px;
-            }
-            .left-side {
-                display: none; /* Hide the left side on mobile */
-            }
-        }
-        @media (max-width: 480px) {
-            .container {
-                width: 100%;
-                border-radius: 0;
-            }
-            .right-side {
-                padding: 20px;
-            }
-            input, button {
-                padding: 15px;
-                font-size: 1em;
+                width: 50%;
             }
         }
     </style>

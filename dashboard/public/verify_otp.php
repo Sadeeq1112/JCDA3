@@ -55,30 +55,148 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCDA - Verify OTP</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 80%;
+            max-width: 1000px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .left-side {
+            background-color: #ffe6e6;
+            padding: 40px;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .right-side {
+            padding: 40px;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .logo {
+            margin-bottom: 20px;
+        }
+        .logo img {
+            max-width: 100px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        input:focus {
+            border-color: #00a86b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
+        }
+        button {
+            background-color: #00a86b;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 168, 107, 0.5);
+        }
+        .links {
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        .links a {
+            color: #00a86b;
+            text-decoration: none;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 90%;
+            }
+            .left-side, .right-side {
+                width: 100%;
+                padding: 20px;
+            }
+            .left-side {
+                display: none; /* Hide the left side on mobile */
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                width: 100%;
+                border-radius: 0;
+            }
+            .right-side {
+                padding: 20px;
+            }
+            input, button {
+                padding: 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h2 class="text-center">Verify Your Email</h2>
-                <p class="text-center">Please enter the OTP sent to your email.</p>
-                <?php if (!empty($error)): ?>
-                    <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
-                <?php endif; ?>
-                <form action="verify_otp.php" method="POST">
-                    <div class="form-group">
-                        <label for="otp">One-Time Password (OTP)</label>
-                        <input type="text" id="otp" name="otp" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-block">Verify OTP</button>
-                </form>
+    <div class="container">
+        <div class="left-side">
+            <div class="logo">
+                <img src="/JCDA.png" alt="JCDA Logo">
             </div>
+            <img src="/api/placeholder/400/300" alt="Illustration" style="max-width: 100%;">
+        </div>
+        <div class="right-side">
+            <h2>Verify Your Email</h2>
+            <p>Please enter the OTP sent to your email.</p>
+            <?php if (!empty($error)): ?>
+                <div class="error" role="alert"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+            <form action="verify_otp.php" method="POST">
+                <div class="form-group">
+                    <label for="otp">One-Time Password (OTP)</label>
+                    <input type="text" id="otp" name="otp" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Verify OTP</button>
+            </form>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
