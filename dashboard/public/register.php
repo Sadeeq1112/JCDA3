@@ -141,7 +141,7 @@ function send_otp_email($email, $otp) {
             flex-direction: column;
         }
         .left-side {
-            background-color: #ffe6e6;
+            background-color: #e6ffe6;;
             padding: 40px;
             display: flex;
             flex-direction: column;
