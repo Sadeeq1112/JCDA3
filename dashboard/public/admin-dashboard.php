@@ -62,6 +62,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
     $stmt->execute($params);
     $query_results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// Handle export to CSV
+if (isset($_POST['export_csv'])) {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment;filename=profiles.csv');
+
+    $output = fopen('php://output', 'w');
+    fputcsv($output, ['Surname', 'Full Name', 'L.G.A', 'State', 'Phone', 'Email', 'Contact Address', 'Qualification', 'Date of Birth', 'Occupation']);
+
+    foreach ($profiles as $profile) {
+        fputcsv($output, [
+            $profile['surname'] ?? '',
+            $profile['full_name'] ?? '',
+            $profile['lga'] ?? '',
+            $profile['state'] ?? '',
+            $profile['phone'] ?? '',
+            $profile['email'] ?? '',
+            $profile['contact_address'] ?? '',
+            $profile['qualification'] ?? '',
+            $profile['date_of_birth'] ?? '',
+            $profile['occupation'] ?? ''
+        ]);
+    }
+
+    fclose($output);
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -119,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
                 <input type="text" name="query" class="form-control" placeholder="Search profiles...">
             </div>
             <button type="submit" name="query_profiles" class="btn btn-primary">Search</button>
+            <button type="submit" name="export_csv" class="btn btn-secondary">Export to CSV</button>
         </form>
 
         <div class="table-responsive">
@@ -141,16 +169,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
                 <tbody>
                     <?php foreach ($profiles as $profile): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($profile['surname']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['full_name']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['lga']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['state']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['phone']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['email']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['contact_address']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['qualification']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['date_of_birth']); ?></td>
-                            <td><?php echo htmlspecialchars($profile['occupation']); ?></td>
+                            <td><?php echo htmlspecialchars($profile['surname'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['full_name'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['lga'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['state'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['phone'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['email'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['contact_address'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['qualification'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['date_of_birth'] ?? ''); ?></td>
+                            <td><?php echo htmlspecialchars($profile['occupation'] ?? ''); ?></td>
                             <td>
                                 <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editProfileModal<?php echo $profile['user_id']; ?>">Edit</button>
                             </td>
@@ -171,43 +199,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
                                             <input type="hidden" name="user_id" value="<?php echo $profile['user_id']; ?>">
                                             <div class="form-group">
                                                 <label for="surname">Surname:</label>
-                                                <input type="text" id="surname" name="surname" class="form-control" value="<?php echo htmlspecialchars($profile['surname']); ?>" required>
+                                                <input type="text" id="surname" name="surname" class="form-control" value="<?php echo htmlspecialchars($profile['surname'] ?? ''); ?>" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="full_name">Full Name:</label>
-                                                <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo htmlspecialchars($profile['full_name']); ?>" required>
+                                                <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo htmlspecialchars($profile['full_name'] ?? ''); ?>" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="lga">L.G.A:</label>
-                                                <input type="text" id="lga" name="lga" class="form-control" value="<?php echo htmlspecialchars($profile['lga']); ?>">
+                                                <input type="text" id="lga" name="lga" class="form-control" value="<?php echo htmlspecialchars($profile['lga'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group">
                                                 <label for="state">State:</label>
-                                                <input type="text" id="state" name="state" class="form-control" value="<?php echo htmlspecialchars($profile['state']); ?>">
+                                                <input type="text" id="state" name="state" class="form-control" value="<?php echo htmlspecialchars($profile['state'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group">
                                                 <label for="phone">Phone Number:</label>
-                                                <input type="tel" id="phone" name="phone" class="form-control" value="<?php echo htmlspecialchars($profile['phone']); ?>">
+                                                <input type="tel" id="phone" name="phone" class="form-control" value="<?php echo htmlspecialchars($profile['phone'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group">
                                                 <label for="email">Email Address:</label>
-                                                <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($profile['email']); ?>" required>
+                                                <input type="email" id="email" name="email" class="form-control" value="<?php echo htmlspecialchars($profile['email'] ?? ''); ?>" required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="contact_address">Contact Address:</label>
-                                                <textarea id="contact_address" name="contact_address" class="form-control"><?php echo htmlspecialchars($profile['contact_address']); ?></textarea>
+                                                <textarea id="contact_address" name="contact_address" class="form-control"><?php echo htmlspecialchars($profile['contact_address'] ?? ''); ?></textarea>
                                             </div>
                                             <div class="form-group">
                                                 <label for="qualification">Qualification:</label>
-                                                <input type="text" id="qualification" name="qualification" class="form-control" value="<?php echo htmlspecialchars($profile['qualification']); ?>">
+                                                <input type="text" id="qualification" name="qualification" class="form-control" value="<?php echo htmlspecialchars($profile['qualification'] ?? ''); ?>">
                                             </div>
                                             <div class="form-group">
                                                 <label for="date_of_birth">Date of Birth:</label>
-                                                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="<?php echo $profile['date_of_birth']; ?>">
+                                                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" value="<?php echo $profile['date_of_birth'] ?? ''; ?>">
                                             </div>
                                             <div class="form-group">
                                                 <label for="occupation">Occupation:</label>
-                                                <input type="text" id="occupation" name="occupation" class="form-control" value="<?php echo htmlspecialchars($profile['occupation']); ?>">
+                                                <input type="text" id="occupation" name="occupation" class="form-control" value="<?php echo htmlspecialchars($profile['occupation'] ?? ''); ?>">
                                             </div>
                                             <button type="submit" name="update_profile" class="btn btn-primary">Update Profile</button>
                                         </form>
@@ -241,16 +269,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
                     <tbody>
                         <?php foreach ($query_results as $result): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($result['surname']); ?></td>
-                                <td><?php echo htmlspecialchars($result['full_name']); ?></td>
-                                <td><?php echo htmlspecialchars($result['lga']); ?></td>
-                                <td><?php echo htmlspecialchars($result['state']); ?></td>
-                                <td><?php echo htmlspecialchars($result['phone']); ?></td>
-                                <td><?php echo htmlspecialchars($result['email']); ?></td>
-                                <td><?php echo htmlspecialchars($result['contact_address']); ?></td>
-                                <td><?php echo htmlspecialchars($result['qualification']); ?></td>
-                                <td><?php echo htmlspecialchars($result['date_of_birth']); ?></td>
-                                <td><?php echo htmlspecialchars($result['occupation']); ?></td>
+                                <td><?php echo htmlspecialchars($result['surname'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['full_name'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['lga'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['state'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['phone'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['email'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['contact_address'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['qualification'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['date_of_birth'] ?? ''); ?></td>
+                                <td><?php echo htmlspecialchars($result['occupation'] ?? ''); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
