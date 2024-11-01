@@ -65,29 +65,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['query_profiles'])) {
 
 // Handle export to CSV
 if (isset($_POST['export_csv'])) {
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment;filename=profiles.csv');
+    try {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment;filename=profiles.csv');
 
-    $output = fopen('php://output', 'w');
-    fputcsv($output, ['Surname', 'Full Name', 'L.G.A', 'State', 'Phone', 'Email', 'Contact Address', 'Qualification', 'Date of Birth', 'Occupation']);
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            throw new Exception('Failed to open output stream');
+        }
 
-    foreach ($profiles as $profile) {
-        fputcsv($output, [
-            $profile['surname'] ?? '',
-            $profile['full_name'] ?? '',
-            $profile['lga'] ?? '',
-            $profile['state'] ?? '',
-            $profile['phone'] ?? '',
-            $profile['email'] ?? '',
-            $profile['contact_address'] ?? '',
-            $profile['qualification'] ?? '',
-            $profile['date_of_birth'] ?? '',
-            $profile['occupation'] ?? ''
-        ]);
+        fputcsv($output, ['Surname', 'Full Name', 'L.G.A', 'State', 'Phone', 'Email', 'Contact Address', 'Qualification', 'Date of Birth', 'Occupation']);
+
+        foreach ($profiles as $profile) {
+            fputcsv($output, [
+                $profile['surname'] ?? '',
+                $profile['full_name'] ?? '',
+                $profile['lga'] ?? '',
+                $profile['state'] ?? '',
+                $profile['phone'] ?? '',
+                $profile['email'] ?? '',
+                $profile['contact_address'] ?? '',
+                $profile['qualification'] ?? '',
+                $profile['date_of_birth'] ?? '',
+                $profile['occupation'] ?? ''
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    } catch (Exception $e) {
+        echo 'Error exporting to CSV: ' . $e->getMessage();
+        exit;
     }
-
-    fclose($output);
-    exit;
 }
 ?>
 
