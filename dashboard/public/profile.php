@@ -3,9 +3,14 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
-// Add the 'updated' column if it doesn't exist
+// Add the new columns if they don't exist
 try {
-    $pdo->exec("ALTER TABLE profiles ADD COLUMN updated TINYINT(1) DEFAULT 0");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN surname VARCHAR(255)");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN lga VARCHAR(255)");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN state VARCHAR(255)");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN email VARCHAR(255)");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN contact_address TEXT");
+    $pdo->exec("ALTER TABLE profiles ADD COLUMN qualification VARCHAR(255)");
 } catch (PDOException $e) {
     // Ignore the error if the column already exists
     if ($e->getCode() != '42S21') {
@@ -34,15 +39,20 @@ $profile = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $surname = trim($_POST['surname']);
     $full_name = trim($_POST['full_name']);
-    $address = trim($_POST['address']);
+    $lga = trim($_POST['lga']);
+    $state = trim($_POST['state']);
     $phone = trim($_POST['phone']);
+    $email = trim($_POST['email']);
+    $contact_address = trim($_POST['contact_address']);
+    $qualification = trim($_POST['qualification']);
     $date_of_birth = $_POST['date_of_birth'];
     $occupation = trim($_POST['occupation']);
     $profile_picture = $_FILES['profile_picture'];
 
-    if (empty($full_name)) {
-        $error = "Full name is required.";
+    if (empty($full_name) || empty($surname) || empty($email)) {
+        $error = "Surname, full name, and email are required.";
     } else {
         // Handle profile picture upload
         if ($profile_picture['error'] == UPLOAD_ERR_OK) {
@@ -59,12 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($profile) {
             // Update existing profile
-            $stmt = $pdo->prepare("UPDATE profiles SET full_name = ?, address = ?, phone = ?, date_of_birth = ?, occupation = ?, profile_picture = ?, updated = 1 WHERE user_id = ?");
-            $params = [$full_name, $address, $phone, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+            $stmt = $pdo->prepare("UPDATE profiles SET surname = ?, full_name = ?, lga = ?, state = ?, phone = ?, email = ?, contact_address = ?, qualification = ?, date_of_birth = ?, occupation = ?, profile_picture = ?, updated = 1 WHERE user_id = ?");
+            $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
         } else {
             // Insert new profile
-            $stmt = $pdo->prepare("INSERT INTO profiles (full_name, address, phone, date_of_birth, occupation, profile_picture, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
-            $params = [$full_name, $address, $phone, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+            $stmt = $pdo->prepare("INSERT INTO profiles (surname, full_name, lga, state, phone, email, contact_address, qualification, date_of_birth, occupation, profile_picture, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+            $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
         }
 
         if ($stmt->execute($params)) {
@@ -298,16 +308,36 @@ $readonly = $profile && $profile['updated'] == 1;
                 <?php endif; ?>
                 <form action="profile.php" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
+                        <label for="surname">Surname:</label>
+                        <input type="text" id="surname" name="surname" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['surname']) : ''; ?>" required>
+                    </div>
+                    <div class="form-group">
                         <label for="full_name">Full Name:</label>
                         <input type="text" id="full_name" name="full_name" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['full_name']) : ''; ?>" required>
                     </div>
                     <div class="form-group">
-                        <label for="address">Address:</label>
-                        <textarea id="address" name="address" class="form-control"><?php echo $profile ? htmlspecialchars($profile['address']) : ''; ?></textarea>
+                        <label for="lga">L.G.A:</label>
+                        <input type="text" id="lga" name="lga" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['lga']) : ''; ?>">
                     </div>
                     <div class="form-group">
-                        <label for="phone">Phone:</label>
+                        <label for="state">State:</label>
+                        <input type="text" id="state" name="state" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['state']) : ''; ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number:</label>
                         <input type="tel" id="phone" name="phone" class="form-control <?php echo $readonly ? 'readonly' : ''; ?>" value="<?php echo $profile ? htmlspecialchars($profile['phone']) : ''; ?>" <?php echo $readonly ? 'readonly' : ''; ?>>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" name="email" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['email']) : ''; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_address">Contact Address:</label>
+                        <textarea id="contact_address" name="contact_address" class="form-control"><?php echo $profile ? htmlspecialchars($profile['contact_address']) : ''; ?></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="qualification">Qualification:</label>
+                        <input type="text" id="qualification" name="qualification" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['qualification']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="date_of_birth">Date of Birth:</label>
