@@ -67,24 +67,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $profile_picture_path = $profile['profile_picture'] ?? null;
         }
 
-        if ($profile) {
-            // Update existing profile
-            $stmt = $pdo->prepare("UPDATE profiles SET surname = ?, full_name = ?, lga = ?, state = ?, phone = ?, email = ?, contact_address = ?, qualification = ?, date_of_birth = ?, occupation = ?, profile_picture = ?, updated = 1 WHERE user_id = ?");
-            $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
-        } else {
-            // Insert new profile
-            $stmt = $pdo->prepare("INSERT INTO profiles (surname, full_name, lga, state, phone, email, contact_address, qualification, date_of_birth, occupation, profile_picture, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
-            $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
-        }
+        // Check if the user_id exists in the users table
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user_exists = $stmt->fetchColumn();
 
-        if ($stmt->execute($params)) {
-            $success = "Profile updated successfully.";
-            // Refresh profile data
-            $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
-            $stmt->execute([$user_id]);
-            $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($user_exists) {
+            if ($profile) {
+                // Update existing profile
+                $stmt = $pdo->prepare("UPDATE profiles SET surname = ?, full_name = ?, lga = ?, state = ?, phone = ?, email = ?, contact_address = ?, qualification = ?, date_of_birth = ?, occupation = ?, profile_picture = ?, updated = 1 WHERE user_id = ?");
+                $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+            } else {
+                // Insert new profile
+                $stmt = $pdo->prepare("INSERT INTO profiles (surname, full_name, lga, state, phone, email, contact_address, qualification, date_of_birth, occupation, profile_picture, user_id, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+                $params = [$surname, $full_name, $lga, $state, $phone, $email, $contact_address, $qualification, $date_of_birth, $occupation, $profile_picture_path, $user_id];
+            }
+
+            if ($stmt->execute($params)) {
+                $success = "Profile updated successfully.";
+                // Refresh profile data
+                $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
+                $stmt->execute([$user_id]);
+                $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+            } else {
+                $error = "Failed to update profile. Please try again.";
+            }
         } else {
-            $error = "Failed to update profile. Please try again.";
+            $error = "User ID does not exist.";
         }
     }
 }
