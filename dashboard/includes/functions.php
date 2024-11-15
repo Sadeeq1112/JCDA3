@@ -86,4 +86,22 @@ function is_payment_valid($payment_id) {
     $payment = $stmt->fetch();
     return $payment && $payment['payment_status'] === 'completed';
 }
+
+/**
+ * Log an activity
+ * @param string $admin_username
+ * @param string $action
+ * @param string $details
+ */
+function log_activity($admin_username, $action, $details = '') {
+    global $pdo;
+
+    $stmt = $pdo->prepare("INSERT INTO admin_logs (admin_username, action, details, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
+    $stmt->execute([
+        $admin_username,
+        $action,
+        $details,
+        $_SERVER['REMOTE_ADDR']
+    ]);
+}
 ?>

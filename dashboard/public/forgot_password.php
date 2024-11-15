@@ -99,7 +99,7 @@ function send_reset_email($email, $token) {
         // Content
         $mail->isHTML(true);
         $mail->Subject = 'Password Reset for JCDA';
-        $mail->Body    = "Hello,<br><br>We received a request to reset your password. Click the link below to reset your password:<br><a href='https://jcda.com.ng/dashboard/publicreset_password.php?token=$token'>Reset Password</a><br><br>This link will expire in 1 hour.<br><br>If you did not request a password reset, please ignore this email.<br><br>Thank you,<br>JCDA Team";
+        $mail->Body    = "Hello,<br><br>We received a request to reset your password. Click the link below to reset your password:<br><a href='https://jcda.com.ng/dashboard/public/reset_password.php?token=$token'>Reset Password</a><br><br>This link will expire in 1 hour.<br><br>If you did not request a password reset, please ignore this email.<br><br>Thank you,<br>JCDA Team";
         $mail->AltBody = "Hello,\n\nWe received a request to reset your password. Click the link below to reset your password:\nhttps://jcda.com.ng/dashboard/public/reset_password.php?token=$token\n\nThis link will expire in 1 hour.\n\nIf you did not request a password reset, please ignore this email.\n\nThank you,\nJCDA Team";
 
         $mail->send();
