@@ -104,4 +104,40 @@ function log_activity($admin_username, $action, $details = '') {
         $_SERVER['REMOTE_ADDR']
     ]);
 }
+
+/**
+ * Validates a date string
+ * @param string $date Date string in Y-m-d format
+ * @return bool Returns true if date is valid and user is at least 18 years old
+ */
+function validate_date($date) {
+    // Check if the date is in valid format
+    if (!preg_match("/^\d{4}-\d{2}-\d{2}$/", $date)) {
+        return false;
+    }
+    
+    // Convert date string to timestamp
+    $timestamp = strtotime($date);
+    if ($timestamp === false) {
+        return false;
+    }
+    
+    // Check if date is valid (e.g., not 2023-02-30)
+    $date_parts = explode('-', $date);
+    if (!checkdate($date_parts[1], $date_parts[2], $date_parts[0])) {
+        return false;
+    }
+    
+    // Calculate age
+    $birth_date = new DateTime($date);
+    $today = new DateTime('today');
+    $age = $birth_date->diff($today)->y;
+    
+    // Check if user is at least 18 years old
+    if ($age < 18) {
+        return false;
+    }
+    
+    return true;
+}
 ?>
