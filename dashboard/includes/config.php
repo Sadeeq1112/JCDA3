@@ -7,7 +7,7 @@ define('DB_PASS', 'd6C(YdA62yWm9-');
 define('JWT_SECRET', 'yH!8xP#mK$qW2zL&nF5vC7bE9jT3sA6d');
 
 define('SITE_NAME', 'JCDA Member Dashboard');
-define('SITE_URL', 'https://jcda.com.g');
+define('SITE_URL', 'https://jcda.com.ng');
 
 // Flutterwave API keys
 define('FLUTTERWAVE_PUBLIC_KEY', 'your_flutterwave_public_key');

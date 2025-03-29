@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCDA - Membership Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #2c6e49;
+            --secondary-green: #4d9078;
+            --background-light: #f4f4f4;
+            --text-dark: #333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: var(--background-light);
+        }
+
+        .card-container {
+            display: flex;
+            width: 680px;
+            height: 440px;
+            perspective: 1000px;
+        }
+
+        .membership-card {
+            width: 340px;
+            height: 440px;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-back {
+            background: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Front Card Styles */
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+            border-radius: 10px;
+            background: white;
+            padding: 5px;
+        }
+
+        .org-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .member-photo {
+            width: 120px;
+            height: 150px;
+            object-fit: cover;
+            align-self: center;
+            margin: 15px 0;
+            border: 3px solid var(--primary-green);
+        }
+
+        .card-details {
+            padding: 0 20px;
+            flex-grow: 1;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 5px;
+        }
+
+        .detail-label {
+            color: var(--primary-green);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .detail-value {
+            font-weight: 400;
+            text-align: right;
+        }
+
+        .card-footer {
+            background: var(--primary-green);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        /* Back Card Styles */
+        .back-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .back-details {
+            width: 80%;
+            text-align: center;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            margin: 20px 0;
+        }
+
+        .signature-line {
+            width: 200px;
+            border-bottom: 1px solid var(--text-dark);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <!-- Front Card -->
+        <div class="membership-card">
+            <div class="card-front">
+                <div class="card-header">
+                    <img src="/JCDA.png" alt="JCDA Logo" class="logo">
+                    <div>
+                        <h1 class="org-name">Jos Community Development</h1>
+                        <small>Membership Card</small>
+                    </div>
+                </div>
+
+                <img src="/team images/PHOTO-2024-09-20-22-09-53.jpg" 
+                     alt="Member Photo" class="member-photo">
+
+                <div class="card-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Full Name</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['surname']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Membership ID</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($card['card_number']); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Issue Date</span>
+                        <span class="detail-value"><?php echo date('d/m/Y', strtotime($card['issue_date'])); ?></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Expiry Date</span>
+                        <span class="detail-value"><?php echo date('d/m/Y', strtotime($card['expiry_date'])); ?></span>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    Official Membership Card - Jos Community Development Association
+                </div>
+            </div>
+
+            <!-- Back Card -->
+            <div class="card-back">
+                <div class="back-header">
+                    <h2>Membership Verification</h2>
+                </div>
+
+                <img src="data:image/png;base64,<?php echo $qr_base64; ?>" alt="QR Code" class="qr-code">
+
+                <div class="back-details">
+                    <p>This card is the property of Jos Community Development Association. 
+                    If found, please return to the address below.</p>
+                    
+                    <p>Contact: admin@jcda.org | +234 XXX XXX XXXX</p>
+                </div>
+
+                <div>
+                    <span>Authorized Signature</span>
+                    <div class="signature-line"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
