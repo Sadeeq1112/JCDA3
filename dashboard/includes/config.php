@@ -1,14 +1,14 @@
 <?php
 // File: config.php
 define('DB_HOST', 'localhost');
-// define('DB_NAME', 'bfsllkdc_membership');
-// define('DB_USER', 'bfsllkdc_member');
-// define('DB_PASS', 'd6C(YdA62yWm9-');
+define('DB_NAME', 'bfsllkdc_membership');
+define('DB_USER', 'bfsllkdc_member');
+define('DB_PASS', 'd6C(YdA62yWm9-');
 define('JWT_SECRET', 'yH!8xP#mK$qW2zL&nF5vC7bE9jT3sA6d');
 
-define('DB_NAME', 'jcda_database');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// define('DB_NAME', 'jcda_database');
+// define('DB_USER', 'root');
+// define('DB_PASS', '');
 
 define('SITE_NAME', 'JCDA Member Dashboard');
 define('SITE_URL', 'https://jcda.com.ng');
