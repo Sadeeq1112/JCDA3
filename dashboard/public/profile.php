@@ -21,6 +21,12 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Get the ID as a number
+$stmt = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+$stmt->execute([$username]);
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$user_id = $result ? (int)$result['id'] : null;
+
 // Fetch user profile information
 $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
 $stmt->execute([$user_id]);
@@ -90,14 +96,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                   $highest_qualification, $gender, $state, $lga, $street_address,
                                   $profile_picture_path, $user_id];
                     } else {
-                        // Insert new profile
+                        // Generate random membership ID: JCDA- + random letter (A-Z) + random 4 digits
+                        $random_letter = chr(rand(65, 90)); // A-Z in ASCII
+                        $random_digits = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                        $membership_id = 'JCDA-' . $random_letter . $random_digits;
+
                         $stmt = $pdo->prepare("INSERT INTO profiles (firstname, surname, other_names, 
-                            date_of_birth, occupation, highest_qualification, gender, state, lga, 
-                            street_address, profile_picture, user_id, updated) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+                                            date_of_birth, occupation, highest_qualification, gender, state, lga, 
+                                            street_address, profile_picture, user_id, membership_id_no, updated) 
+                                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
+
                         $params = [$firstname, $surname, $other_names, $date_of_birth, $occupation,
-                                  $highest_qualification, $gender, $state, $lga, $street_address,
-                                  $profile_picture_path, $user_id];
+                                $highest_qualification, $gender, $state, $lga, $street_address,
+                                $profile_picture_path, $user_id, $membership_id];
                     }
 
                     if ($stmt->execute($params)) {
@@ -200,71 +211,74 @@ $states_lgas = [
             position: relative;
         }
 
-        /* Sidebar Styles */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(145deg, var(--primary-color), var(--secondary-color));
+            width: 200px; /* Default to expanded width */
+            background-color: #378349;
             color: white;
-            padding: 2rem 1rem;
-            transition: all var(--transition-speed) ease;
+            padding: 20px;
+            transition: width 0.3s, transform 0.3s;
             position: fixed;
-            height: 100vh;
+            top: 0;
+            bottom: 0;
+            left: 0;
             overflow-y: auto;
-            z-index: 1000;
         }
-
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
         .sidebar .logo {
-            text-align: center;
-            padding: 1rem 0 2rem;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
         }
-
         .sidebar .logo img {
-            max-width: 140px;
+            max-width: 100px;
             height: auto;
-            transition: all var(--transition-speed);
         }
-
         .sidebar ul {
-            list-style: none;
+            list-style-type: none;
             padding: 0;
         }
-
         .sidebar li {
-            margin: 1rem 0;
+            margin-bottom: 20px; /* Increased margin */
         }
-
         .sidebar a {
             color: white;
             text-decoration: none;
             display: flex;
             align-items: center;
-            padding: 0.8rem 1rem;
-            border-radius: var(--border-radius);
-            transition: all var(--transition-speed);
+            position: relative;
         }
-
-        .sidebar a:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
         .sidebar a.active {
-            background: rgba(255, 255, 255, 0.2);
-            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+            left: -6px;
         }
-
         .sidebar-icon {
-            margin-right: 1rem;
+            margin-right: 10px;
             width: 20px;
-            text-align: center;
+            height: 20px;
+            text-align: center; /* Align icons */
+        }
+        .sidebar .sidebar-text {
+            display: inline;
         }
 
         /* Main Content Styles */
         .main-content {
-            flex: 1;
-            margin-left: 280px;
-            padding: 2rem;
-            transition: all var(--transition-speed);
+            flex-grow: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            margin: 20px;
+            margin-left: 220px; /* Adjusted for sidebar */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: margin-left 0.3s;
+        }
+        .main-content.expanded {
+            margin-left: 220px; /* Adjusted for expanded sidebar */
         }
 
         .header {

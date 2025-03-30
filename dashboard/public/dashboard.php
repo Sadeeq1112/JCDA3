@@ -259,7 +259,7 @@ $profile_picture = $profile['profile_picture'] ?? '../assets/images/useravatar.j
             <section class="profile-summary">
                 <h2>Profile Summary</h2>
                 <?php if ($profile): ?>
-                    <p>Name: <?php echo htmlspecialchars($profile['full_name']); ?></p>
+                    <p>Name: <?php echo htmlspecialchars($profile['firstname'] . (!empty($profile['other_names']) ? ' ' . $profile['other_names'] : '') . ' ' . $profile['surname']); ?></p>
                     <p>Occupation: <?php echo htmlspecialchars($profile['occupation']); ?></p>
                 <?php else: ?>
                     <p><a href="profile.php">Please complete your profile.</a></p>
