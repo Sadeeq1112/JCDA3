@@ -1,4 +1,5 @@
 name: Deploy to cPanel
+
 on:
   push:
     branches:
@@ -8,12 +9,19 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Deploy to cPanel
-        uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      - name: Checkout code
+        uses: actions/checkout@v4  # Use latest version
+        
+      - name: Deploy to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.1  # Latest version as of 2023
         with:
           server: ${{ secrets.CPANEL_FTP_SERVER }}
           username: ${{ secrets.CPANEL_FTP_USERNAME }}
           password: ${{ secrets.CPANEL_FTP_PASSWORD }}
-          server-dir: jcda.com.ng/home/bfsllkdc/public_html
+          server-dir: /home/bfsllkdc/public_html/  # Added trailing slash
+          local-dir: ./  # Explicitly specify local directory
+          exclude: |
+            .git*
+            .github/*
+            README.md
+            *.env
