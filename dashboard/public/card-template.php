@@ -12,6 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <link rel="stylesheet" href="../assets/css/card.css">
 
+    <style>
+        .detail-label {
+            text-wrap: nowrap !important;
+        }
+
+        .detail-value {
+            text-wrap: nowrap !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,8 +34,9 @@
 
                     <div class="card-details" style="margin-top: 2px;">
                         <div style="width: 290px; margin: 0 auto; text-align: center;">
-                            <h3 class="auto-resize-text" style="margin: 0; font-family: Inter; white-space: nowrap;text-align: center;font-weight: 600">
-                            <?php echo isset($_POST['fullname']) ? htmlspecialchars($_POST['fullname']) : 'No Name Provided'; ?>
+                            <h3 class="auto-resize-text"
+                                style="margin: 0; font-family: Inter; white-space: nowrap;text-align: center;font-weight: 600">
+                                <?php echo isset($_POST['fullname']) ? htmlspecialchars($_POST['fullname']) : 'No Name Provided'; ?>
                             </h3>
                         </div>
 

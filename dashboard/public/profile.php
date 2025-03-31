@@ -512,14 +512,14 @@ $states_lgas = [
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="date_of_birth">Date of Birth:</label>
-                                <input type="date" id="date_of_birth" name="date_of_birth" class="form-control" 
+                                <input style="padding-top: 8px;" type="date" id="date_of_birth" name="date_of_birth" class="form-control" 
                                     value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="gender">Gender:</label>
-                                <select id="gender" name="gender" class="form-control" required>
+                                <select id="gender" name="gender" class="form-control" required style="padding-top: 8px;">
                                     <option value="">Select Gender</option>
                                     <option value="male" <?php echo ($profile && $profile['gender'] == 'male') ? 'selected' : ''; ?>>Male</option>
                                     <option value="female" <?php echo ($profile && $profile['gender'] == 'female') ? 'selected' : ''; ?>>Female</option>
@@ -539,7 +539,7 @@ $states_lgas = [
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="highest_qualification">Highest Academic Qualification:</label>
-                                <select id="highest_qualification" name="highest_qualification" class="form-control" required>
+                                <select id="highest_qualification" name="highest_qualification" class="form-control" required style="padding-top: 8px;">
                                     <option value="">Select Qualification</option>
                                     <option value="SSCE" <?php echo ($profile && $profile['highest_qualification'] == 'SSCE') ? 'selected' : ''; ?>>SSCE</option>
                                     <option value="ND" <?php echo ($profile && $profile['highest_qualification'] == 'ND') ? 'selected' : ''; ?>>ND</option>
@@ -556,7 +556,7 @@ $states_lgas = [
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label for="state">State:</label>
-                                <select id="state" name="state" class="form-control" required>
+                                <select id="state" name="state" class="form-control" required style="padding-top: 8px;">
                                     <option value="">Select State</option>
                                     <?php foreach ($states_lgas as $state => $lgas): ?>
                                         <option value="<?php echo htmlspecialchars($state); ?>" 
@@ -567,10 +567,11 @@ $states_lgas = [
                                 </select>
                             </div>
                         </div>
+                        
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="lga">LGA:</label>
-                                <select id="lga" name="lga" class="form-control" required>
+                                <label for="lga">LGA: <span style="color: #7d7d7d;font-style: italic;"><?php echo $profile['lga'];?></span></label>
+                                <select id="lga" name="lga" class="form-control" required placeholder="" style="padding-top: 8px;">
                                     <option value="">Select LGA</option>
                                     <?php
                                     if ($profile && $profile['state']) {
