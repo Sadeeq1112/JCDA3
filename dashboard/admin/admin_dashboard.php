@@ -2,6 +2,7 @@
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/db.php';
+require_once '../includes/functions.php';
 
 // Check admin authentication
 if (!isset($_SESSION['admin_logged_in'])) {
@@ -9,8 +10,29 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit;
 }
 
-// Define states array for the filter dropdown
-$states = array_keys($states_lgas);
+// Session timeout check (15 minutes)
+$session_timeout = 15 * 60; // 15 minutes in seconds
+if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_activity'] > $session_timeout)) {
+    // Session expired
+    session_unset();
+    session_destroy();
+    header("Location: admin_login.php?timeout=1");
+    exit;
+}
+$_SESSION['admin_last_activity'] = time(); // Update last activity time
+
+// Define Nigerian states if the $states_lgas variable isn't available
+if (!isset($states_lgas)) {
+    $states = [
+        'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 
+        'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 
+        'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 
+        'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 
+        'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
+    ];
+} else {
+    $states = array_keys($states_lgas);
+}
 
 // Handle search and filters
 $searchQuery = "WHERE 1=1";
