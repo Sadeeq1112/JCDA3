@@ -22,17 +22,13 @@ if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_a
 $_SESSION['admin_last_activity'] = time(); // Update last activity time
 
 // Define Nigerian states if the $states_lgas variable isn't available
-if (!isset($states_lgas)) {
-    $states = [
-        'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 
-        'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 
-        'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 
-        'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 
-        'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
-    ];
-} else {
-    $states = array_keys($states_lgas);
-}
+$states = [
+    'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 
+    'Borno', 'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 
+    'Gombe', 'Imo', 'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 
+    'Kwara', 'Lagos', 'Nasarawa', 'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 
+    'Plateau', 'Rivers', 'Sokoto', 'Taraba', 'Yobe', 'Zamfara'
+];
 
 // Handle search and filters
 $searchQuery = "WHERE 1=1";
@@ -60,23 +56,65 @@ if (!empty($_GET['sort']) && in_array($_GET['sort'], ['ASC', 'DESC'])) {
     $sortOrder = $_GET['sort'];
 }
 
+// Check if profiles table exists and has the expected columns
+$tableExists = false;
+$validColumns = ['user_id', 'firstname', 'surname', 'email', 'date_of_birth', 'gender', 'state'];
+$availableColumns = [];
+
+try {
+    $checkTable = $pdo->query("SHOW TABLES LIKE 'profiles'");
+    $tableExists = ($checkTable && $checkTable->rowCount() > 0);
+    
+    if ($tableExists) {
+        $columnsQuery = $pdo->query("DESCRIBE profiles");
+        while ($col = $columnsQuery->fetch(PDO::FETCH_ASSOC)) {
+            $availableColumns[] = $col['Field'];
+        }
+    }
+} catch (PDOException $e) {
+    error_log("Error checking table structure: " . $e->getMessage());
+}
+
 // Pagination setup
 $limit = 20;
 $page = isset($_GET['page']) && $_GET['page'] > 0 ? intval($_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// Get total records
-$totalStmt = $pdo->prepare("SELECT COUNT(*) FROM profiles $searchQuery");
-$totalStmt->execute($params);
-$totalRecords = $totalStmt->fetchColumn();
-$totalPages = ceil($totalRecords / $limit);
+// Initialize variables
+$totalRecords = 0;
+$totalPages = 0;
+$profiles = [];
 
-// Fetch profiles
-$profilesStmt = $pdo->prepare("SELECT * FROM profiles $searchQuery ORDER BY surname $sortOrder LIMIT ? OFFSET ?");
-$params[] = $limit;
-$params[] = $offset;
-$profilesStmt->execute($params);
-$profiles = $profilesStmt->fetchAll(PDO::FETCH_ASSOC);
+// Only attempt to fetch data if the table exists
+if ($tableExists) {
+    try {
+        // Get total records
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM profiles $searchQuery");
+        $totalStmt->execute($params);
+        $totalRecords = $totalStmt->fetchColumn();
+        $totalPages = ceil($totalRecords / $limit);
+        
+        // Create a new array for all parameters
+        $queryParams = $params;
+        
+        // Fetch profiles with proper parameter binding
+        $stmt = $pdo->prepare("SELECT * FROM profiles $searchQuery ORDER BY surname $sortOrder LIMIT ? OFFSET ?");
+        
+        // Add limit and offset parameters
+        $queryParams[] = intval($limit);
+        $queryParams[] = intval($offset);
+        
+        $stmt->execute($queryParams);
+        $profiles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+    } catch (PDOException $e) {
+        error_log("Error fetching profiles: " . $e->getMessage());
+        // Initialize empty array to prevent errors
+        $profiles = [];
+    }
+}
+
+// Set up statistics
 $stats = [
     'total_users' => 0,
     'new_today' => 0,
@@ -84,22 +122,25 @@ $stats = [
     'gender_distribution' => ['Male' => 0, 'Female' => 0, 'Other' => 0]
 ];
 
-try {
-    // Only gather stats if table exists
-    if ($tableExists) {
+if ($tableExists) {
+    try {
         // Total users
         $stmt = $pdo->query("SELECT COUNT(*) FROM profiles");
         $stats['total_users'] = $stmt->fetchColumn();
         
         // New users today
-        $stmt = $pdo->query("SELECT COUNT(*) FROM profiles WHERE DATE(created_at) = CURDATE()");
-        $stats['new_today'] = $stmt->fetchColumn();
+        if (in_array('created_at', $availableColumns)) {
+            $stmt = $pdo->query("SELECT COUNT(*) FROM profiles WHERE DATE(created_at) = CURDATE()");
+            $stats['new_today'] = $stmt->fetchColumn();
+        }
         
         // Users by state
         if (in_array('state', $availableColumns)) {
             $stmt = $pdo->query("SELECT state, COUNT(*) as count FROM profiles GROUP BY state ORDER BY count DESC LIMIT 5");
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $stats['states_distribution'][$row['state']] = $row['count'];
+                if (!empty($row['state'])) {
+                    $stats['states_distribution'][$row['state']] = $row['count'];
+                }
             }
         }
         
@@ -107,17 +148,150 @@ try {
         if (in_array('gender', $availableColumns)) {
             $stmt = $pdo->query("SELECT gender, COUNT(*) as count FROM profiles GROUP BY gender");
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $gender = $row['gender'] ?: 'Other';
+                $gender = !empty($row['gender']) ? $row['gender'] : 'Other';
                 $stats['gender_distribution'][$gender] = $row['count'];
             }
         }
+    } catch (PDOException $e) {
+        error_log("Error fetching statistics: " . $e->getMessage());
     }
-} catch (PDOException $e) {
-    error_log("Error fetching statistics: " . $e->getMessage());
+}
+
+// Admin actions handler
+$actionMessage = '';
+$actionStatus = '';
+
+if (isset($_GET['action']) && isset($_GET['id'])) {
+    $action = $_GET['action'];
+    $userId = intval($_GET['id']);
+    
+    try {
+        switch ($action) {
+            case 'delete':
+                if (isset($_GET['confirmed']) && $_GET['confirmed'] == 1) {
+                    $stmt = $pdo->prepare("DELETE FROM profiles WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $actionMessage = "User successfully deleted";
+                    $actionStatus = "success";
+                } else {
+                    // Just show confirmation message in the UI
+                    $actionMessage = "Are you sure you want to delete this user? This action cannot be undone.";
+                    $actionStatus = "warning";
+                }
+                break;
+                
+            case 'verify':
+                if (in_array('verified', $availableColumns)) {
+                    $stmt = $pdo->prepare("UPDATE profiles SET verified = 1 WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $actionMessage = "User successfully verified";
+                    $actionStatus = "success";
+                } else {
+                    $actionMessage = "Verification column not found in database";
+                    $actionStatus = "danger";
+                }
+                break;
+                
+            case 'block':
+                if (in_array('status', $availableColumns)) {
+                    $stmt = $pdo->prepare("UPDATE profiles SET status = 'blocked' WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $actionMessage = "User has been blocked";
+                    $actionStatus = "warning";
+                } else {
+                    $actionMessage = "Status column not found in database";
+                    $actionStatus = "danger";
+                }
+                break;
+                
+            case 'unblock':
+                if (in_array('status', $availableColumns)) {
+                    $stmt = $pdo->prepare("UPDATE profiles SET status = 'active' WHERE id = ?");
+                    $stmt->execute([$userId]);
+                    $actionMessage = "User has been unblocked";
+                    $actionStatus = "success";
+                } else {
+                    $actionMessage = "Status column not found in database";
+                    $actionStatus = "danger";
+                }
+                break;
+        }
+    } catch (PDOException $e) {
+        $actionMessage = "Error: " . $e->getMessage();
+        $actionStatus = "danger";
+        error_log("Admin action error: " . $e->getMessage());
+    }
+}
+
+// Process bulk actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action']) && !empty($_POST['selected_users'])) {
+    $bulkAction = $_POST['bulk_action'];
+    $selectedUsers = $_POST['selected_users'];
+    $validUserIds = [];
+    
+    // Validate user IDs
+    foreach ($selectedUsers as $userId) {
+        if (is_numeric($userId)) {
+            $validUserIds[] = intval($userId);
+        }
+    }
+    
+    if (!empty($validUserIds)) {
+        try {
+            $placeholders = implode(',', array_fill(0, count($validUserIds), '?'));
+            
+            switch ($bulkAction) {
+                case 'delete':
+                    $stmt = $pdo->prepare("DELETE FROM profiles WHERE id IN ($placeholders)");
+                    $stmt->execute($validUserIds);
+                    $actionMessage = count($validUserIds) . " users have been deleted";
+                    $actionStatus = "success";
+                    break;
+                    
+                case 'verify':
+                    if (in_array('verified', $availableColumns)) {
+                        $stmt = $pdo->prepare("UPDATE profiles SET verified = 1 WHERE id IN ($placeholders)");
+                        $stmt->execute($validUserIds);
+                        $actionMessage = count($validUserIds) . " users have been verified";
+                        $actionStatus = "success";
+                    } else {
+                        $actionMessage = "Verification column not found in database";
+                        $actionStatus = "danger";
+                    }
+                    break;
+                    
+                case 'block':
+                    if (in_array('status', $availableColumns)) {
+                        $stmt = $pdo->prepare("UPDATE profiles SET status = 'blocked' WHERE id IN ($placeholders)");
+                        $stmt->execute($validUserIds);
+                        $actionMessage = count($validUserIds) . " users have been blocked";
+                        $actionStatus = "warning";
+                    } else {
+                        $actionMessage = "Status column not found in database";
+                        $actionStatus = "danger";
+                    }
+                    break;
+                    
+                case 'unblock':
+                    if (in_array('status', $availableColumns)) {
+                        $stmt = $pdo->prepare("UPDATE profiles SET status = 'active' WHERE id IN ($placeholders)");
+                        $stmt->execute($validUserIds);
+                        $actionMessage = count($validUserIds) . " users have been unblocked";
+                        $actionStatus = "success";
+                    } else {
+                        $actionMessage = "Status column not found in database";
+                        $actionStatus = "danger";
+                    }
+                    break;
+            }
+        } catch (PDOException $e) {
+            $actionMessage = "Error processing bulk action: " . $e->getMessage();
+            $actionStatus = "danger";
+            error_log("Admin bulk action error: " . $e->getMessage());
+        }
+    }
 }
 ?>
-?>
-
 
 <!DOCTYPE html>
 <html lang="en">
