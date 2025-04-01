@@ -25,7 +25,7 @@
 
 <body>
     <div>
-        <div class="card-container" id="card-container">
+        <div class="card-container" id="card-container" style="margin-left: 8px;margin-top: 8px;display: grid;gap: 10px;">
             <!-- Front Card -->
             <div class="membership-card" style="margin-right: 40px;">
                 <div class="card-front" style="margin-top: 110px;height: 415px;">

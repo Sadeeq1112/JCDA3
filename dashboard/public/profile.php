@@ -28,7 +28,7 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 $user_id = $result ? (int)$result['id'] : null;
 
 // Fetch user profile information
-$stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
+$stmt = $pdo->prepare("SELECT *, updated FROM profiles WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $profile = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
 
                     if ($stmt->execute($params)) {
-                        $success = "Profile updated successfully.";
+                        $success = "Profile information saved successfully.";
                         // Refresh profile data
                         $stmt = $pdo->prepare("SELECT * FROM profiles WHERE user_id = ?");
                         $stmt->execute([$user_id]);
@@ -449,6 +449,52 @@ $states_lgas = [
         .form-control-file:hover {
             border-color: var(--primary-color);
         }
+
+        /* Add to your CSS file */
+.form-control:disabled, .form-control[readonly] {
+    background-color: #f8f9fa;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* For submitted forms */
+.form-submitted .form-group label {
+    color: #6c757d;
+}
+
+/* Add to your CSS */
+#confirmationContent img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+#confirmationContent strong {
+    display: block;
+    margin-top: 15px;
+}
+
+    .modal-body p {
+        display: flex;
+        justify-content: space-between;
+        align-content: center;
+        align-items: center;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #dbdada;
+        padding-bottom: 6px;
+    }
+
+    .modal-body p strong {
+        margin: 0 !important;
+    }
     </style>
 </head>
 <body>
@@ -478,138 +524,333 @@ $states_lgas = [
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
                 <?php endif; ?>
-                <?php if ($success): ?>
-                    <div class="alert alert-success"><?php echo htmlspecialchars($success); ?></div>
-                <?php endif; ?>
-                <form action="profile.php" method="POST" enctype="multipart/form-data">
-                    <!-- CSRF Token -->
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="surname">Surname:</label>
-                                <input type="text" id="surname" name="surname" class="form-control" 
-                                    value="<?php echo $profile ? htmlspecialchars($profile['surname']) : ''; ?>" required>
+                <div class="alert alert-success" id="successAlert" style="display: none;">
+                    Profile saved successfully.
+                </div>
+                
+                
+                <div class="<?php echo ($profile && $profile['updated']) ? 'form-submitted' : ''; ?>">
+                    <form id="profileForm" action="profile.php" method="POST" enctype="multipart/form-data">
+                        <!-- CSRF Token -->
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="surname">Surname:</label>
+                                    <input type="text" id="surname" name="surname" class="form-control" value="<?php echo $profile ? htmlspecialchars($profile['surname']) : ''; ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="firstname">First Name:</label>
+                                    <input type="text" id="firstname" name="firstname" class="form-control" 
+                                        value="<?php echo $profile ? htmlspecialchars($profile['firstname']) : ''; ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="other_names">Other Names:</label>
+                                    <input type="text" id="other_names" name="other_names" class="form-control" 
+                                        value="<?php echo $profile ? htmlspecialchars($profile['other_names']) : ''; ?>">
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="firstname">First Name:</label>
-                                <input type="text" id="firstname" name="firstname" class="form-control" 
-                                    value="<?php echo $profile ? htmlspecialchars($profile['firstname']) : ''; ?>" required>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="other_names">Other Names:</label>
-                                <input type="text" id="other_names" name="other_names" class="form-control" 
-                                    value="<?php echo $profile ? htmlspecialchars($profile['other_names']) : ''; ?>">
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="date_of_birth">Date of Birth:</label>
-                                <input style="padding-top: 8px;" type="date" id="date_of_birth" name="date_of_birth" class="form-control" 
-                                    value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="date_of_birth">Date of Birth:</label>
+                                    <input style="padding-top: 8px;" type="date" id="date_of_birth" name="date_of_birth" class="form-control" 
+                                        value="<?php echo $profile ? $profile['date_of_birth'] : ''; ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="gender">Gender:</label>
+                                    <select id="gender" name="gender" class="form-control" required style="padding-top: 8px;">
+                                        <option value="">Select Gender</option>
+                                        <option value="male" <?php echo ($profile && $profile['gender'] == 'male') ? 'selected' : ''; ?>>Male</option>
+                                        <option value="female" <?php echo ($profile && $profile['gender'] == 'female') ? 'selected' : ''; ?>>Female</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="gender">Gender:</label>
-                                <select id="gender" name="gender" class="form-control" required style="padding-top: 8px;">
-                                    <option value="">Select Gender</option>
-                                    <option value="male" <?php echo ($profile && $profile['gender'] == 'male') ? 'selected' : ''; ?>>Male</option>
-                                    <option value="female" <?php echo ($profile && $profile['gender'] == 'female') ? 'selected' : ''; ?>>Female</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="occupation">Occupation:</label>
-                                <input type="text" id="occupation" name="occupation" class="form-control" 
-                                    value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="occupation">Occupation:</label>
+                                    <input type="text" id="occupation" name="occupation" class="form-control" 
+                                        value="<?php echo $profile ? htmlspecialchars($profile['occupation']) : ''; ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="highest_qualification">Highest Academic Qualification:</label>
+                                    <select id="highest_qualification" name="highest_qualification" class="form-control" required style="padding-top: 8px;">
+                                        <option value="">Select Qualification</option>
+                                        <option value="SSCE" <?php echo ($profile && $profile['highest_qualification'] == 'SSCE') ? 'selected' : ''; ?>>SSCE</option>
+                                        <option value="ND" <?php echo ($profile && $profile['highest_qualification'] == 'ND') ? 'selected' : ''; ?>>ND</option>
+                                        <option value="HND" <?php echo ($profile && $profile['highest_qualification'] == 'HND') ? 'selected' : ''; ?>>HND</option>
+                                        <option value="BSc" <?php echo ($profile && $profile['highest_qualification'] == 'BSc') ? 'selected' : ''; ?>>BSc</option>
+                                        <option value="MSc" <?php echo ($profile && $profile['highest_qualification'] == 'MSc') ? 'selected' : ''; ?>>MSc</option>
+                                        <option value="PhD" <?php echo ($profile && $profile['highest_qualification'] == 'PhD') ? 'selected' : ''; ?>>PhD</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="highest_qualification">Highest Academic Qualification:</label>
-                                <select id="highest_qualification" name="highest_qualification" class="form-control" required style="padding-top: 8px;">
-                                    <option value="">Select Qualification</option>
-                                    <option value="SSCE" <?php echo ($profile && $profile['highest_qualification'] == 'SSCE') ? 'selected' : ''; ?>>SSCE</option>
-                                    <option value="ND" <?php echo ($profile && $profile['highest_qualification'] == 'ND') ? 'selected' : ''; ?>>ND</option>
-                                    <option value="HND" <?php echo ($profile && $profile['highest_qualification'] == 'HND') ? 'selected' : ''; ?>>HND</option>
-                                    <option value="BSc" <?php echo ($profile && $profile['highest_qualification'] == 'BSc') ? 'selected' : ''; ?>>BSc</option>
-                                    <option value="MSc" <?php echo ($profile && $profile['highest_qualification'] == 'MSc') ? 'selected' : ''; ?>>MSc</option>
-                                    <option value="PhD" <?php echo ($profile && $profile['highest_qualification'] == 'PhD') ? 'selected' : ''; ?>>PhD</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="state">State:</label>
-                                <select id="state" name="state" class="form-control" required style="padding-top: 8px;">
-                                    <option value="">Select State</option>
-                                    <?php foreach ($states_lgas as $state => $lgas): ?>
-                                        <option value="<?php echo htmlspecialchars($state); ?>" 
-                                            <?php echo ($profile && $profile['state'] == $state) ? 'selected' : ''; ?>>
-                                            <?php echo htmlspecialchars($state); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="state">State:</label>
+                                    <?php if ($profile && $profile['updated']): ?>
+                                        <input type="text" class="form-control" 
+                                        value="<?php echo htmlspecialchars($profile['state']); ?>" disabled>
+                                    <?php else: ?>
+                                        <select id="state" name="state" class="form-control" required style="padding-top: 8px;">
+                                            <option value="">Select State</option>
+                                            <?php foreach ($states_lgas as $state => $lgas): ?>
+                                                <option value="<?php echo htmlspecialchars($state); ?>" 
+                                                    <?php echo ($profile && $profile['state'] == $state) ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($state); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="lga">LGA: <span style="color: #7d7d7d;font-style: italic;"><?php echo $profile['lga'];?></span></label>
-                                <select id="lga" name="lga" class="form-control" required placeholder="" style="padding-top: 8px;">
-                                    <option value="">Select LGA</option>
-                                    <?php
-                                    if ($profile && $profile['state']) {
-                                        foreach ($states_lgas[$profile['state']] as $lga) {
-                                            echo '<option value="' . htmlspecialchars($lga) . '" ' . 
-                                                ($profile['lga'] == $lga ? 'selected' : '') . '>' . 
-                                                htmlspecialchars($lga) . '</option>';
+                            
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="lga">LGA:</label>
+                                    <?php if ($profile && $profile['updated']): ?>
+                                        <input type="text" class="form-control" 
+                                        value="<?php echo htmlspecialchars($profile['lga']); ?>" disabled>
+                                    <?php else: ?>
+                                        <select id="lga" name="lga" class="form-control" required placeholder="" style="padding-top: 8px;">
+                                        <option value="">Select LGA</option>
+                                        <?php
+                                        if ($profile && $profile['state']) {
+                                            foreach ($states_lgas[$profile['state']] as $lga) {
+                                                echo '<option value="' . htmlspecialchars($lga) . '" ' . 
+                                                    ($profile['lga'] == $lga ? 'selected' : '') . '>' . 
+                                                    htmlspecialchars($lga) . '</option>';
+                                            }
                                         }
-                                    }
-                                    ?>
-                                </select>
+                                        ?>
+                                    </select>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="street_address">Street Address:</label>
+                                    <input type="text" id="street_address" name="street_address" class="form-control" 
+                                        value="<?php echo $profile ? htmlspecialchars($profile['street_address']) : ''; ?>" required>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="street_address">Street Address:</label>
-                                <input type="text" id="street_address" name="street_address" class="form-control" 
-                                    value="<?php echo $profile ? htmlspecialchars($profile['street_address']) : ''; ?>" required>
+
+                        <div class="form-group">
+                            <label for="profile_picture">Profile Picture:</label>
+                            <input type="file" id="profile_picture" name="profile_picture" class="form-control-file">
+                        </div>
+                        <div id="imagePreviewContainer" style="margin-top: 10px;margin-bottom: 30px;">
+                            <img id="imagePreview" src="#" alt="" style="max-width: 200px; max-height: 200px;">
+                        </div>
+
+                        <button type="button" id="submitBtn" class="btn btn-primary">Save Profile</button>
+                    </form>
+                </div>
+
+                <!-- Confirmation Modal -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmationModalLabel">Confirm Profile Information</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <h5 class="modal-body" style="font-weight: 200 !important;font-size: 15px;color: #686767;margin-bottom: 0px;">Please review your details carefully before submitting. Ensure all information is accurate. Edits cannot be made before final submission.</h5>
+                            <div class="modal-body" id="confirmationContent">
+                                <!-- Dynamic content will be inserted here -->
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" id="confirmSubmit" class="btn btn-primary">Yes, Submit</button>
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="profile_picture">Profile Picture:</label>
-                        <input type="file" id="profile_picture" name="profile_picture" class="form-control-file">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                </form>
+                </div>
                 <a href="dashboard.php" class="btn btn-secondary mt-3">Back to Dashboard</a>
             </section>
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
+
+    <script>
+        // Add this to your $(document).ready() function
+$('#profile_picture').change(function() {
+    const file = this.files[0];
+    const previewContainer = $('#imagePreviewContainer');
+    const preview = $('#imagePreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.attr('src', e.target.result);
+            previewContainer.show();
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.hide();
+        preview.attr('src', '#');
+    }
+});
+    </script>
+    <script>
+        $(document).ready(function() {
+            const isSubmitted = <?php echo ($profile && $profile['updated']) ? 'true' : 'false'; ?>;
+    
+            if (isSubmitted) {
+                disableAllInputs();
+                $('#submitBtn').prop('disabled', true).text('Profile Submitted');
+            }
+            // Changed the button type to "button" to prevent direct submission
+            $('#submitBtn').click(function(e) {
+                e.preventDefault();
+                
+                // Check if all required fields are filled
+                let isValid = true;
+                $('#profileForm [required]').each(function() {
+                    if (!$(this).val()) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+                
+                if (!isValid) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Gather all form data for display in the modal
+                let formData = {};
+                $('#profileForm').serializeArray().forEach(function(item) {
+                    formData[item.name] = item.value;
+                });
+                
+                let profilePicDisplay = 'No image selected';
+if ($('#profile_picture')[0].files[0]) {
+    profilePicDisplay = `<img src="${URL.createObjectURL($('#profile_picture')[0].files[0])}" 
+                        style="max-width: 200px; max-height: 200px; display: block; margin-top: 10px;">`;
+}
+                
+                // Format the data for display
+                let displayContent = `
+                    <p><strong>Surname:</strong> ${formData.surname || ''}</p>
+                    <p><strong>First Name:</strong> ${formData.firstname || ''}</p>
+                    <p><strong>Other Names:</strong> ${formData.other_names || 'N/A'}</p>
+                    <p><strong>Date of Birth:</strong> ${formData.date_of_birth || ''}</p>
+                    <p style="text-transform: capitalize;"><strong>Gender:</strong> ${formData.gender || ''}</p>
+                    <p><strong>Occupation:</strong> ${formData.occupation || ''}</p>
+                    <p><strong>Highest Qualification:</strong> ${formData.highest_qualification || ''}</p>
+                    <p><strong>State:</strong> ${formData.state || ''}</p>
+                    <p><strong>LGA:</strong> ${formData.lga || ''}</p>
+                    <p><strong>Street Address:</strong> ${formData.street_address || ''}</p>
+                    <p><strong>Profile Picture:</strong></p>${profilePicDisplay}
+                `;
+                
+                // Display in modal
+                $('#confirmationContent').html(displayContent);
+                $('#confirmationModal').modal('show');
+            });
+
+            function disableAllInputs() {
+        $('#profileForm :input').not('[type="hidden"]').prop('disabled', true);
+        $('#profile_picture').prop('disabled', true);
+    }
+            
+            // Handle the final submission
+            $('#confirmSubmit').click(function() {
+    const formData = new FormData(document.getElementById('profileForm'));
+    const confirmBtn = $(this);
+    const originalBtnText = confirmBtn.html();
+    const modal = $('#confirmationModal'); // Your modal selector
+    
+    // Set loading state
+    confirmBtn.prop('disabled', true).html(`
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...
+    `);
+
+    $.ajax({
+        url: $('#profileForm').attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            // 1. Disable form inputs
+            disableAllInputs();
+            
+            // 2. Update button (inside modal)
+            confirmBtn.prop('disabled', true).html(`
+                <i class="bi bi-check-circle-fill"></i> Submitted Successfully
+            `);
+            
+            // 3. Close the modal
+            modal.modal('hide');
+            
+            // 4. Show existing success alert for 3 seconds
+            const successAlert = $('#successAlert');
+            successAlert.fadeIn();
+            
+            setTimeout(() => {
+                successAlert.fadeOut();
+            }, 3000);
+        },
+        error: function(xhr) {
+            // Error handling
+            alert('Error: ' + (xhr.responseText || 'Submission failed'));
+            confirmBtn.prop('disabled', false).html(originalBtnText);
+        }
+    });
+});
+            
+            // Update LGA options when state changes
+            $('#state').change(function() {
+                let state = $(this).val();
+                let lgaSelect = $('#lga');
+                
+                lgaSelect.empty();
+                lgaSelect.append('<option value="">Select LGA</option>');
+                
+                if (state) {
+                    // This assumes you have a states_lgas object available in JavaScript
+                    // You might need to echo this from PHP to JavaScript
+                    let lgAs = <?php echo json_encode($states_lgas); ?>[state];
+                    
+                    if (lgAs) {
+                        lgAs.forEach(function(lga) {
+                            lgaSelect.append(`<option value="${lga}">${lga}</option>`);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Cache DOM elements
@@ -702,7 +943,7 @@ $states_lgas = [
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         userProfileImage.src = e.target.result;
-                        showNotification('Profile picture updated', 'success');
+                        // showNotification('Profile picture updated', 'success');
                     };
                     reader.readAsDataURL(file);
                 }

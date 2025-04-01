@@ -52,6 +52,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_no'])) {
     echo json_encode(['status' => 'success']);
     exit;
 }
+
+// Check if membership is paid and not expired
+$isPaid = false;
+$expiryDate = null;
+
+try {
+    $stmt = $pdo->prepare("SELECT expiry_date FROM payments 
+                          WHERE user_id = :user_id 
+                          AND payment_status = 'success'
+                          AND NOW() BETWEEN payment_date AND expiry_date
+                          ORDER BY payment_date DESC 
+                          LIMIT 1");
+    $stmt->execute([':user_id' => $user_id]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result) {
+        $isPaid = true;
+        $expiryDate = $result['expiry_date'];
+    }
+} catch (PDOException $e) {
+    error_log("Error checking payment status: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -371,74 +393,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['membership_no'])) {
                         </p>
                     <?php endif; ?>
 
-                    <p><img src="../assets/images/success.svg" style="max-width: 20px;margin-right: 10px;" alt="">Membership
-                        dues must be paid</p>
+                    <?php if ($isPaid): ?>
+                        <!-- Show success message -->
+                        <p>
+                            <img src="../assets/images/success.svg" style="max-width: 20px;margin-right: 10px;" alt="">Membership dues successfully paid
+                        </p>
+                    <?php else: ?>
+                        <!-- Show payment prompt -->
+                        <p>
+                            <img src="../assets/images/pending.svg" style="max-width: 20px;margin-right: 10px;" alt="">
+                            Membership dues not paid
+                            <a href="payment.php" class="btn btn-sm btn-outline-secondary"
+                                style="margin-left: 10px;font-size: 12px;background: #7b8271;color: white;border: none;">
+                                Pay Dues
+                            </a>
+                        </p>
+                    <?php endif; ?>
 
                     <?php if (!empty($user['surname']) && !empty($user['profile_picture'])): ?>
-                        <button type="button" id="generate-btn" class="btn btn-primary">Generate your card </button><br>
+                        <button type="button" id="generate-btn" class="btn btn-primary" style="margin-top: 20px;">Generate your card </button><br>
                         <a href="dashboard.php" class="btn btn-outline-secondary mt-3">Back to Dashboard</a>
-                        <?php endif; ?>
+                    <?php endif; ?>
 
-                        <div id="card-data" style="display: none;">
-                            <span
-                                id="fullname"><?php echo htmlspecialchars($user['firstname'] . (!empty($user['other_names']) ? ' ' . $user['other_names'] : '') . ' ' . $user['surname']); ?></span>
-                            <span
-                                id="profile_picture"><?php echo htmlspecialchars($user['profile_picture'] ?? ''); ?></span>
-                            <span id="occupation"><?php echo htmlspecialchars($user['occupation'] ?? ''); ?></span>
-                            <span id="membership_no"><?php echo htmlspecialchars($user['membership_id_no'] ?? ''); ?></span>
-                            <span
-                                id="card_issue_date"><?php echo htmlspecialchars($user['card_issue_date'] ?? ''); ?></span>
-                            <span
-                                id="card_expiry_date"><?php echo htmlspecialchars($user['card_expiry_date'] ?? ''); ?></span>
-                        </div>
+                    <div id="card-data" style="display: none;">
+                        <span
+                            id="fullname"><?php echo htmlspecialchars($user['firstname'] . (!empty($user['other_names']) ? ' ' . $user['other_names'] : '') . ' ' . $user['surname']); ?></span>
+                        <span id="profile_picture"><?php echo htmlspecialchars($user['profile_picture'] ?? ''); ?></span>
+                        <span id="occupation"><?php echo htmlspecialchars($user['occupation'] ?? ''); ?></span>
+                        <span id="membership_no"><?php echo htmlspecialchars($user['membership_id_no'] ?? ''); ?></span>
+                        <span id="card_issue_date"><?php echo htmlspecialchars($user['card_issue_date'] ?? ''); ?></span>
+                        <span id="card_expiry_date"><?php echo htmlspecialchars($user['card_expiry_date'] ?? ''); ?></span>
+                    </div>
 
-                        <script>
-                            document.getElementById('generate-btn').addEventListener('click', function () {
-                                const membershipNo = document.getElementById('membership_no').textContent;
+                    <script>
+                        document.getElementById('generate-btn').addEventListener('click', function () {
+                            const membershipNo = document.getElementById('membership_no').textContent;
 
-                                // 1. Update database via AJAX
-                                fetch(window.location.href, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/x-www-form-urlencoded',
-                                    },
-                                    body: new URLSearchParams({
-                                        'membership_no': membershipNo
-                                    })
+                            // 1. Update database via AJAX
+                            fetch(window.location.href, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams({
+                                    'membership_no': membershipNo
                                 })
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        if (data.status === 'success') {
-                                            // 2. Collect data for card-template.html
-                                            const cardData = {
-                                                fullname: document.getElementById('fullname').textContent,
-                                                profile_picture: document.getElementById('profile_picture').textContent,
-                                                membership_no: membershipNo,
-                                                occupation: document.getElementById('occupation').textContent,
-                                                card_issue_date: new Date().toISOString().split('T')[0], // Today's date
-                                                card_expiry_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0] // +1 year
-                                            };
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success') {
+                                        // 2. Collect data for card-template.html
+                                        const cardData = {
+                                            fullname: document.getElementById('fullname').textContent,
+                                            profile_picture: document.getElementById('profile_picture').textContent,
+                                            membership_no: membershipNo,
+                                            occupation: document.getElementById('occupation').textContent,
+                                            card_issue_date: new Date().toISOString().split('T')[0], // Today's date
+                                            card_expiry_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0] // +1 year
+                                        };
 
-                                            // 3. Redirect to card-template.html with data
-                                            const form = document.createElement('form');
-                                            form.method = 'POST';
-                                            form.action = 'card-template.php';
+                                        // 3. Redirect to card-template.html with data
+                                        const form = document.createElement('form');
+                                        form.method = 'POST';
+                                        form.action = 'card-template.php';
 
-                                            Object.keys(cardData).forEach(key => {
-                                                const input = document.createElement('input');
-                                                input.type = 'hidden';
-                                                input.name = key;
-                                                input.value = cardData[key];
-                                                form.appendChild(input);
-                                            });
+                                        Object.keys(cardData).forEach(key => {
+                                            const input = document.createElement('input');
+                                            input.type = 'hidden';
+                                            input.name = key;
+                                            input.value = cardData[key];
+                                            form.appendChild(input);
+                                        });
 
-                                            document.body.appendChild(form);
-                                            form.submit();
-                                        }
-                                    })
-                                    .catch(error => console.error('Error:', error));
-                            });
-                        </script>
+                                        document.body.appendChild(form);
+                                        form.submit();
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
+                        });
+                    </script>
                 </section>
             <?php else: ?>
                 <section class="profile-summary">

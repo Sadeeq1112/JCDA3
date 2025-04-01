@@ -270,7 +270,7 @@ $profile_picture = $profile['profile_picture'] ?? '../assets/images/useravatar.j
                 <h2>Payment Status</h2>
                 <?php if ($latest_payment): ?>
                     <p>Last Payment: <?php echo date("F j, Y", strtotime($latest_payment['payment_date'])); ?></p>
-                    <p>Amount: $<?php echo number_format($latest_payment['amount'], 2); ?></p>
+                    <p>Amount: ₦<?php echo number_format($latest_payment['amount'], 2); ?></p>
                     <p>Status: <?php echo ucfirst($latest_payment['payment_status']); ?></p>
                 <?php else: ?>
                     <p>No payment records found.</p>
