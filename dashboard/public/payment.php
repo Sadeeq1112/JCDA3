@@ -21,7 +21,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'];
 
-echo $user_id;
 // Fetch user information
 $stmt = $pdo->prepare("SELECT u.email, p.full_name, p.phone, p.profile_picture FROM users u LEFT JOIN profiles p ON u.id = p.user_id WHERE u.id = ?");
 $stmt->execute([$user_id]);
@@ -33,6 +32,11 @@ $profile_picture = $user['profile_picture'] ?? '../assets/images/useravatar.jpg'
 // Set annual dues amount
 $annual_dues = 5000; // ₦5,000
 
+$stmt = $pdo->prepare("SELECT id, email FROM users WHERE username = ?");
+$stmt->execute([$username]);
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$user_id = $result ? (int) $result['id'] : null;
+$email = $result ? $result['email'] : null;
 
 // Fetch payment records for this user
 $payments = [];
@@ -441,41 +445,71 @@ if (isset($_SESSION['alert'])) {
 
 
                 <?php
-                // Check for active payment and get expiry date
-                $activePayment = null;
-                try {
-                    $stmt = $pdo->prepare("SELECT expiry_date FROM payments 
-                          WHERE user_id = :user_id 
-                          AND payment_status = 'success'
-                          AND NOW() BETWEEN payment_date AND expiry_date
-                          ORDER BY payment_date DESC 
-                          LIMIT 1");
-                    $stmt->execute([':user_id' => $user_id]);
-                    $activePayment = $stmt->fetch(PDO::FETCH_ASSOC);
-                } catch (PDOException $e) {
-                    error_log("Error checking payment status: " . $e->getMessage());
-                }
-                ?>
+// Check for active payment and get expiry date
+$activePayment = null;
+$expiredPayment = null;
+try {
+    // Check for active payment
+    $stmt = $pdo->prepare("SELECT expiry_date FROM payments 
+          WHERE user_id = :user_id 
+          AND payment_status = 'success'
+          AND NOW() BETWEEN payment_date AND expiry_date
+          ORDER BY payment_date DESC 
+          LIMIT 1");
+    $stmt->execute([':user_id' => $user_id]);
+    $activePayment = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // If no active payment, check for most recent expired payment
+    if (!$activePayment) {
+        $stmt = $pdo->prepare("SELECT expiry_date FROM payments 
+              WHERE user_id = :user_id 
+              AND payment_status = 'success'
+              AND expiry_date < NOW()
+              ORDER BY expiry_date DESC 
+              LIMIT 1");
+        $stmt->execute([':user_id' => $user_id]);
+        $expiredPayment = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+} catch (PDOException $e) {
+    error_log("Error checking payment status: " . $e->getMessage());
+}
+?>
 
-                <?php if ($activePayment): ?>
-                    <!-- Show payment confirmation with expiry date -->
-                    <div
-                        style="background: #d4edda; padding: 15px; border-radius: 5px; padding-bottom: 5px; margin-bottom: 10px;">
-                        <h5>Dues Fully Paid.</h5>
-                        <p>You have no cancelled dues to be paid.</p>
-                        <p> <strong>Membership Expiry:
-                                <?php echo date('F j, Y', strtotime($activePayment['expiry_date'])); ?></strong></p>
-                    </div>
-                <?php else: ?>
-                    <!-- Show payment form -->
-                    <form action="payment.php" method="POST">
-                        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
-                        <input type="hidden" name="email" value="<?php echo $user['email']; ?>">
-                        <input type="hidden" name="amount" value="<?php echo $annual_dues; ?>">
-                        <p>Annual Dues Amount: ₦<?php echo number_format($annual_dues, 2); ?></p>
-                        <button type="submit" class="btn btn-primary">Pay Now</button>
-                    </form>
-                <?php endif; ?>
+<?php if ($activePayment): ?>
+    <!-- Show payment confirmation with expiry date -->
+    <div style="background: #d4edda; padding: 15px; border-radius: 5px; padding-bottom: 5px; margin-bottom: 10px;">
+        <h5>Dues Fully Paid.</h5>
+        <p>You have no cancelled dues to be paid.</p>
+        <p> <strong>Membership Expiry:
+                <?php echo date('F j, Y', strtotime($activePayment['expiry_date'])); ?></strong></p>
+    </div>
+<?php elseif ($expiredPayment): ?>
+    <!-- Show expired membership notice -->
+    <div style="background: #edd4d4; padding: 15px; border-radius: 5px; padding-bottom: 5px; margin-bottom: 10px;">
+        <h5>Membership expired</h5>
+        <p>Your annual membership has expired on
+            <?php echo date('F j, Y', strtotime($expiredPayment['expiry_date'])); ?>. Please pay a renewal.
+        </p>
+        <form action="payment.php" method="POST" style="margin-bottom: 10px;">
+            <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+            <input type="hidden" name="email" value="<?php echo $email; ?>">
+            <input type="hidden" name="amount" value="<?php echo $annual_dues; ?>">
+            <p>Annual Dues Amount: ₦<?php echo number_format($annual_dues, 2); ?></p>
+            <button type="submit" class="btn btn-primary">Pay Now</button>
+        </form>
+    </div>
+<?php else: ?>
+    <!-- Show payment form for new members or those without any payment history -->
+    <form action="payment.php" method="POST">
+        <input type="hidden" name="user_id" value="<?php echo $user_id; ?>">
+        <input type="hidden" name="email" value="<?php echo $email; ?>">
+        <input type="hidden" name="amount" value="<?php echo $annual_dues; ?>">
+        <p>Annual Dues Amount: ₦<?php echo number_format($annual_dues, 2); ?></p>
+        <button type="submit" class="btn btn-primary">Pay Now</button>
+    </form>
+<?php endif; ?>
+
+
                 <a href="dashboard.php" class="btn btn-secondary mt-3">Back to Dashboard</a>
             </section>
 

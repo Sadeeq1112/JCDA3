@@ -14,8 +14,7 @@ define('SITE_NAME', 'JCDA Member Dashboard');
 define('SITE_URL', 'https://jcda.com.ng');
 
 // Flutterwave API keys
-define('FLUTTERWAVE_PUBLIC_KEY', 'your_flutterwave_public_key');
-define('FLUTTERWAVE_SECRET_KEY', 'your_flutterwave_secret_key');
+define('PAYSTACK_SECRET_KEY', 'sk_test_63303bb3d720a38af47c926c08c861eebf6267a8');
 
 // Email configuration (if using email functionality)
 define('SMTP_HOST', 'mail.jcda.com.ng');

@@ -410,10 +410,11 @@ try {
                         </p>
                     <?php endif; ?>
 
-                    <?php if (!empty($user['surname']) && !empty($user['profile_picture'])): ?>
-                        <button type="button" id="generate-btn" class="btn btn-primary" style="margin-top: 20px;">Generate your card </button><br>
-                        <a href="dashboard.php" class="btn btn-outline-secondary mt-3">Back to Dashboard</a>
+                    <?php if (!empty($user['surname']) && !empty($user['profile_picture'])  && !empty($isPaid)): ?>
+                        <button type="button" id="generate-btn" class="btn btn-primary" style="margin-top: 20px;">Generate your card</button><br>
                     <?php endif; ?>
+
+                    <a href="dashboard.php" class="btn btn-outline-secondary mt-3">Back to Dashboard</a>
 
                     <div id="card-data" style="display: none;">
                         <span
