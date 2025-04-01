@@ -109,7 +109,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$is_locked) {
         error_log("Potential CSRF attack on admin login. IP: $ip_address, User Agent: {$_SERVER['HTTP_USER_AGENT']}");
     } else {
         // Sanitize inputs
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+        $username = filter_input(INPUT_POST, 'username'); 
+        if ($username !== null && $username !== false) {
+            $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+        } else {
+            $username = '';
+        }
         $password = $_POST['password'] ?? '';
         
         if (empty($username) || empty($password)) {
